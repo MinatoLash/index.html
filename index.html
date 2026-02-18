@@ -5,8 +5,7 @@
 <title>Diphoka Funeral Parlour</title>
 
 <style>
-
-body{
+body {
     margin:0;
     font-family: Arial, sans-serif;
     background:black;
@@ -16,31 +15,43 @@ body{
 
 .header{
     padding:25px;
-    border-bottom:2px solid gold;
+    border-bottom:3px solid gold;
+    background: linear-gradient(to right, #000000, #111111);
 }
 
 .header h1{
     color:gold;
     margin:5px;
+    font-size:28px;
+}
+
+.header img{
+    width:80px;
+    margin-bottom:10px;
 }
 
 .card{
     background:#111;
-    margin:15px;
-    padding:15px;
-    border-radius:10px;
-    border:1px solid gold;
+    margin:20px;
+    padding:20px;
+    border-radius:15px;
+    border:2px solid gold;
+    text-align:left;
+    max-width:500px;
+    margin-left:auto;
+    margin-right:auto;
 }
 
 button{
-    width:90%;
+    width:100%;
     padding:18px;
-    margin:10px;
+    margin:10px 0;
     background:black;
     color:white;
     border:2px solid gold;
-    border-radius:8px;
+    border-radius:12px;
     font-size:18px;
+    cursor:pointer;
 }
 
 button:hover{
@@ -61,8 +72,9 @@ button:hover{
     border:none;
     padding:12px;
     margin-top:10px;
-    border-radius:6px;
+    border-radius:8px;
     font-weight:bold;
+    cursor:pointer;
 }
 
 </style>
@@ -71,63 +83,5 @@ button:hover{
 <body>
 
 <div class="header">
-    <h1>👒 Diphoka Funeral Parlour</h1>
-    <p>Digital Funeral Information</p>
-</div>
-
-<div class="card">
-
-<button onclick="toggle('programme')">📄 Funeral Programme</button>
-<div id="programme" class="section">
-    <p>Opening Prayer</p>
-    <p>Welcome & Announcements</p>
-    <p>Tributes</p>
-    <p>Sermon</p>
-    <p>Final Viewing</p>
-    <p>Procession to Cemetery</p>
-</div>
-
-<button onclick="toggle('home')">👒 Find My Home</button>
-<div id="home" class="section">
-    <p>Family Home Address:</p>
-    <p>123 Main Street, Soweto</p>
-
-    <a href="https://maps.google.com?q=123+Main+Street+Soweto">
-        <button class="mapbtn">OPEN DIRECTIONS</button>
-    </a>
-</div>
-
-<button onclick="toggle('service')">⛪ Find My Service</button>
-<div id="service" class="section">
-    <p>Methodist Church of SA</p>
-    <p>07:00 – 11:00</p>
-
-    <a href="https://maps.google.com?q=Methodist+Church+of+SA">
-        <button class="mapbtn">VIEW SERVICE LOCATION</button>
-    </a>
-</div>
-
-<button onclick="toggle('cemetery')">⚰️ Find My Cemetery</button>
-<div id="cemetery" class="section">
-    <p>Westpark Cemetery</p>
-
-    <a href="https://maps.google.com?q=Westpark+Cemetery">
-        <button class="mapbtn">OPEN CEMETERY LOCATION</button>
-    </a>
-</div>
-
-</div>
-
-<script>
-function toggle(id){
-    var x = document.getElementById(id);
-    if(x.style.display === "block"){
-        x.style.display = "none";
-    } else {
-        x.style.display = "block";
-    }
-}
-</script>
-
-</body>
-</html>
+    <img src="https://i.imgur.com/fXw6X1b.png" alt="Sesotho Hat">
+    <h1>👒
