@@ -1,87 +1,145 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diphoka Funeral Parlour</title>
 
 <style>
 body {
-    margin:0;
-    font-family: Arial, sans-serif;
-    background:black;
-    color:white;
-    text-align:center;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to bottom, #000000, #1a1a1a);
+    color: white;
+    text-align: center;
 }
 
-.header{
-    padding:25px;
-    border-bottom:3px solid gold;
-    background: linear-gradient(to right, #000000, #111111);
+header {
+    padding: 40px 20px;
 }
 
-.header h1{
-    color:gold;
-    margin:5px;
-    font-size:28px;
+header img {
+    width: 220px;
+    max-width: 80%;
 }
 
-.header img{
-    width:80px;
-    margin-bottom:10px;
+h1 {
+    font-weight: 300;
+    margin-top: 10px;
+    letter-spacing: 2px;
 }
 
-.card{
-    background:#111;
-    margin:20px;
-    padding:20px;
-    border-radius:15px;
-    border:2px solid gold;
-    text-align:left;
-    max-width:500px;
-    margin-left:auto;
-    margin-right:auto;
+.container {
+    width: 90%;
+    max-width: 500px;
+    margin: auto;
 }
 
-button{
-    width:100%;
-    padding:18px;
-    margin:10px 0;
-    background:black;
-    color:white;
-    border:2px solid gold;
-    border-radius:12px;
-    font-size:18px;
-    cursor:pointer;
+.card {
+    background: linear-gradient(145deg, #d4af37, #a67c00);
+    border-radius: 15px;
+    padding: 15px;
+    margin: 20px 0;
+    color: black;
+    box-shadow: 0 0 20px rgba(212,175,55,0.4);
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-button:hover{
-    background:gold;
-    color:black;
+.card:hover {
+    transform: scale(1.02);
 }
 
-.section{
-    display:none;
-    margin-top:15px;
-    padding:15px;
-    border-top:1px solid gold;
+.card h2 {
+    margin: 0;
+    font-weight: 600;
 }
 
-.mapbtn{
-    background:gold;
-    color:black;
-    border:none;
-    padding:12px;
-    margin-top:10px;
-    border-radius:8px;
-    font-weight:bold;
-    cursor:pointer;
+.content {
+    display: none;
+    margin-top: 10px;
+    text-align: left;
 }
 
+button {
+    background: black;
+    color: gold;
+    border: 2px solid gold;
+    padding: 8px 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: gold;
+    color: black;
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-    <img src="https://i.imgur.com/fXw6X1b.png" alt="Sesotho Hat">
-    <h1>👒
+<header>
+    <img src="logo.png" alt="Diphoka Logo">
+    <h1>Digital Funeral Information</h1>
+</header>
+
+<div class="container">
+
+    <div class="card" onclick="toggle(this)">
+        <h2>📜 Funeral Programme</h2>
+        <div class="content">
+            <ul>
+                <li>Opening Prayer</li>
+                <li>Welcome & Announcements</li>
+                <li>Tributes</li>
+                <li>Sermon</li>
+                <li>Final Viewing</li>
+                <li>Procession to Cemetery</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card" onclick="toggle(this)">
+        <h2>🏠 Find My Home</h2>
+        <div class="content">
+            <p>Click below for directions:</p>
+            <a href="https://maps.google.com" target="_blank">
+                <button>Open Directions</button>
+            </a>
+        </div>
+    </div>
+
+    <div class="card" onclick="toggle(this)">
+        <h2>⛪ Find My Service</h2>
+        <div class="content">
+            <p>Methodist Church of SA</p>
+            <p>08:00 - 11:00</p>
+            <a href="https://maps.google.com" target="_blank">
+                <button>View Service Location</button>
+            </a>
+        </div>
+    </div>
+
+    <div class="card" onclick="toggle(this)">
+        <h2>🪦 Find My Cemetery</h2>
+        <div class="content">
+            <p>Westpark Cemetery</p>
+            <a href="https://maps.google.com" target="_blank">
+                <button>Open Cemetery Location</button>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function toggle(card) {
+    const content = card.querySelector(".content");
+    content.style.display = content.style.display === "block" ? "none" : "block";
+}
+</script>
+
+</body>
+</html>
