@@ -8,138 +8,123 @@
 <style>
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(to bottom, #000000, #1a1a1a);
-    color: white;
+    font-family: 'Georgia', serif;
+    background: linear-gradient(180deg, #000000, #1a1a1a);
+    color: gold;
     text-align: center;
 }
 
-header {
-    padding: 40px 20px;
+/* LOGO */
+.logo {
+    margin-top: 40px;
 }
 
-header img {
+.logo img {
     width: 220px;
-    max-width: 80%;
 }
 
-h1 {
-    font-weight: 300;
+/* HEADING */
+.subtitle {
+    font-size: 20px;
     margin-top: 10px;
     letter-spacing: 2px;
+    color: #d4af37;
 }
 
-.container {
-    width: 90%;
-    max-width: 500px;
-    margin: auto;
-}
-
+/* CARD STYLE */
 .card {
-    background: linear-gradient(145deg, #d4af37, #a67c00);
+    background: linear-gradient(145deg, #111, #1c1c1c);
+    border: 1px solid #d4af37;
     border-radius: 15px;
-    padding: 15px;
-    margin: 20px 0;
-    color: black;
-    box-shadow: 0 0 20px rgba(212,175,55,0.4);
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.card:hover {
-    transform: scale(1.02);
+    margin: 30px auto;
+    padding: 25px;
+    width: 85%;
+    max-width: 600px;
+    box-shadow: 0 0 20px rgba(212,175,55,0.3);
 }
 
 .card h2 {
-    margin: 0;
-    font-weight: 600;
+    margin-bottom: 15px;
 }
 
-.content {
-    display: none;
-    margin-top: 10px;
-    text-align: left;
+ul {
+    list-style-type: none;
+    padding: 0;
 }
 
-button {
-    background: black;
-    color: gold;
-    border: 2px solid gold;
-    padding: 8px 15px;
+ul li {
+    margin: 8px 0;
+}
+
+/* BUTTON */
+.button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    border: 1px solid gold;
     border-radius: 8px;
-    margin-top: 10px;
-    cursor: pointer;
+    text-decoration: none;
+    color: gold;
+    transition: 0.3s;
 }
 
-button:hover {
+.button:hover {
     background: gold;
     color: black;
 }
-</style>
-</head>
 
+/* FOOTER */
+footer {
+    margin: 40px 0;
+    font-size: 14px;
+    color: #999;
+}
+</style>
+
+</head>
 <body>
 
-<header>
+<div class="logo">
     <img src="logo.png" alt="Diphoka Logo">
-    <h1>Digital Funeral Information</h1>
-</header>
-
-<div class="container">
-
-    <div class="card" onclick="toggle(this)">
-        <h2>📜 Funeral Programme</h2>
-        <div class="content">
-            <ul>
-                <li>Opening Prayer</li>
-                <li>Welcome & Announcements</li>
-                <li>Tributes</li>
-                <li>Sermon</li>
-                <li>Final Viewing</li>
-                <li>Procession to Cemetery</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="card" onclick="toggle(this)">
-        <h2>🏠 Find My Home</h2>
-        <div class="content">
-            <p>Click below for directions:</p>
-            <a href="https://maps.google.com" target="_blank">
-                <button>Open Directions</button>
-            </a>
-        </div>
-    </div>
-
-    <div class="card" onclick="toggle(this)">
-        <h2>⛪ Find My Service</h2>
-        <div class="content">
-            <p>Methodist Church of SA</p>
-            <p>08:00 - 11:00</p>
-            <a href="https://maps.google.com" target="_blank">
-                <button>View Service Location</button>
-            </a>
-        </div>
-    </div>
-
-    <div class="card" onclick="toggle(this)">
-        <h2>🪦 Find My Cemetery</h2>
-        <div class="content">
-            <p>Westpark Cemetery</p>
-            <a href="https://maps.google.com" target="_blank">
-                <button>Open Cemetery Location</button>
-            </a>
-        </div>
-    </div>
-
 </div>
 
-<script>
-function toggle(card) {
-    const content = card.querySelector(".content");
-    content.style.display = content.style.display === "block" ? "none" : "block";
-}
-</script>
+<div class="subtitle">
+    Digital Funeral Information
+</div>
+
+<div class="card">
+    <h2>Funeral Programme</h2>
+    <ul>
+        <li>Opening Prayer</li>
+        <li>Welcome & Announcements</li>
+        <li>Tributes</li>
+        <li>Sermon</li>
+        <li>Final Viewing</li>
+        <li>Procession to Cemetery</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2>Find My Home</h2>
+    <p>Click below for directions:</p>
+    <a href="#" class="button">Open Directions</a>
+</div>
+
+<div class="card">
+    <h2>Find My Service</h2>
+    <p>Methodist Church of SA</p>
+    <p>09:30 – 11:00</p>
+    <a href="#" class="button">View Service Location</a>
+</div>
+
+<div class="card">
+    <h2>Find My Cemetery</h2>
+    <a href="#" class="button">Open Cemetery Location</a>
+</div>
+
+<footer>
+    © 2026 Diphoka Funeral Parlour
+</footer>
 
 </body>
 </html>
