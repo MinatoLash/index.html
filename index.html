@@ -6,11 +6,18 @@
 <title>Diphoka Funeral Parlour</title>
 
 <style>
+:root {
+    --gold: #d4af37;
+    --dark: #0a0a0a;
+    --soft-white: #f5f5f5;
+}
+
+/* BODY */
 body {
     margin: 0;
     font-family: 'Georgia', serif;
-    background: linear-gradient(180deg, #000000, #1a1a1a);
-    color: gold;
+    background: radial-gradient(circle at top, #1a1a1a 0%, #000 100%);
+    color: var(--gold);
     text-align: center;
 }
 
@@ -20,76 +27,123 @@ body {
 }
 
 .logo img {
-    width: 220px;
-}
-    
-/*COVER IMAGE*/
-.cover {
-    margin-top: 25px;
-}
-    
-.cover img {
-    width: 100%;
-    max-width: 900px;
-    border-radius: 12px;
-    box-shadow: 0 0 25px rgba(212,175,55,0.35);
-}
-    
-/* HEADING */
-.subtitle {
-    font-size: 20px;
-    margin-top: 10px;
-    letter-spacing: 2px;
-    color: #d4af37;
+    width: 180px;
 }
 
-/* CARD STYLE */
-.card {
-    background: linear-gradient(145deg, #111, #1c1c1c);
-    border: 1px solid #d4af37;
-    border-radius: 15px;
+/* SUBTITLE */
+.subtitle {
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: #aaa;
+    margin-top: 10px;
+}
+
+/* MAIN MEMORIAL CARD */
+.memorial-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(212,175,55,0.4);
+    border-radius: 20px;
     margin: 30px auto;
-    padding: 25px;
+    padding: 30px 20px;
+    width: 90%;
+    max-width: 400px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 30px rgba(212,175,55,0.2);
+}
+
+/* TEXT */
+.memory-text {
+    font-style: italic;
+    color: white;
+    font-size: 18px;
+}
+
+.name {
+    font-size: 28px;
+    color: white;
+    margin: 10px 0 20px;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+/* IMAGE */
+.memorial-img {
+    width: 220px;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 50% / 35%;
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 25px rgba(212,175,55,0.4);
+    margin: 20px 0;
+}
+
+/* DETAILS */
+.details {
+    color: #ddd;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+/* CARDS */
+.card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(212,175,55,0.4);
+    border-radius: 15px;
+    margin: 20px auto;
+    padding: 20px;
     width: 85%;
-    max-width: 600px;
-    box-shadow: 0 0 20px rgba(212,175,55,0.3);
+    max-width: 500px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
 }
 
 .card h2 {
-    margin-bottom: 15px;
+    color: var(--gold);
 }
 
+/* LIST */
 ul {
-    list-style-type: none;
+    list-style: none;
     padding: 0;
+    color: white;
 }
 
 ul li {
-    margin: 8px 0;
+    margin: 10px 0;
+    position: relative;
+    padding-left: 15px;
+}
+
+ul li::before {
+    content: "•";
+    color: var(--gold);
+    position: absolute;
+    left: 0;
 }
 
 /* BUTTON */
 .button {
     display: inline-block;
     margin-top: 15px;
-    padding: 10px 20px;
-    border: 1px solid gold;
+    padding: 12px 20px;
+    border: 1px solid var(--gold);
     border-radius: 8px;
     text-decoration: none;
-    color: gold;
+    color: white;
     transition: 0.3s;
 }
 
 .button:hover {
-    background: gold;
+    background: var(--gold);
     color: black;
+    transform: scale(1.05);
 }
 
 /* FOOTER */
 footer {
     margin: 40px 0;
-    font-size: 14px;
-    color: #999;
+    font-size: 12px;
+    color: #777;
 }
 </style>
 
@@ -97,17 +151,33 @@ footer {
 <body>
 
 <div class="logo">
-    <img src="./logo.png" width="200">
+    <img src="./logo.png">
 </div>
 
 <div class="subtitle">
     Digital Funeral Information
 </div>
 
-<div class="cover">
-    <img src="./cover.png" alt="Funeral Cover Image">
+<!-- MEMORIAL CARD -->
+<div class="memorial-card">
+
+    <div class="memory-text">In Loving Memory of</div>
+
+    <div class="name">
+        Kgomotso Portia<br>Kwena
+    </div>
+
+    <img src="./cover.png" class="memorial-img">
+
+    <div class="details">
+        Date of Birth : 26 March 1991<br>
+        Date of Death : 29 January 2026<br>
+        Date of Burial : 21 February 2026
+    </div>
+
 </div>
 
+<!-- PROGRAM -->
 <div class="card">
     <h2>Funeral Programme</h2>
     <ul>
@@ -125,20 +195,26 @@ footer {
         <li>Speech by Cousins</li>
         <li>Reading Of Wreaths</li>
         <li>Item</li>
-        <li>Speech and Actvities by Traditonal Healers</li>
+        <li>Speech and Activities by Traditional Healers</li>
         <li>Sermon</li>
     </ul>
 </div>
 
+<!-- HOME -->
 <div class="card">
     <h2>Find My Home</h2>
     <p>Click below for directions:</p>
-    <a href="https://maps.app.goo.gl/wDwAYn7bckCS84sYA?g_st=awb" class="button">Open Directions</a>
+    <a href="https://maps.app.goo.gl/wDwAYn7bckCS84sYA?g_st=awb" class="button" target="_blank">
+        Open Directions
+    </a>
 </div>
 
+<!-- CEMETERY -->
 <div class="card">
     <h2>Find My Cemetery</h2>
-    <a href="https://maps.app.goo.gl/9z3QuwgUDZ8immEy7?g_st=awb" class="button">Open Cemetery Location</a>
+    <a href="https://maps.app.goo.gl/9z3QuwgUDZ8immEy7?g_st=awb" class="button" target="_blank">
+        Open Cemetery Location
+    </a>
 </div>
 
 <footer>
@@ -147,9 +223,3 @@ footer {
 
 </body>
 </html>
-
-
-
-
-
-
