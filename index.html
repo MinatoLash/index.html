@@ -1,495 +1,709 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>CityWatch</title>
+<title>Community Issue Reporter</title>
 
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css"
-  />
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet/dist/leaflet.css"
+/>
 
-  <style>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+/>
 
-    *{
-      box-sizing:border-box;
-    }
+<style>
 
-    body{
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      overflow:hidden;
-      background:#f5f5f5;
-    }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-    #map{
-      width:100vw;
-      height:100vh;
-    }
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  overflow:hidden;
+  background:#f4f4f4;
+}
 
-    /* ── Locate Button ── */
+/* ───────────────── MAP ───────────────── */
 
-    .locate-btn{
-      position:fixed;
-      top:15px;
-      left:50%;
-      transform:translateX(-50%);
+#map{
+  width:100vw;
+  height:100vh;
+  z-index:1;
+}
 
-      z-index:1000;
+/* ───────────────── TOP HEADER ───────────────── */
 
-      border:none;
-      border-radius:999px;
+.top-header{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
 
-      background:#007bff;
-      color:white;
+  z-index:1200;
 
-      padding:10px 18px;
+  background:white;
 
-      font-size:14px;
-      font-weight:600;
+  padding:22px 20px 18px;
 
-      cursor:pointer;
+  text-align:center;
 
-      box-shadow:0 2px 10px rgba(0,0,0,0.25);
-    }
+  box-shadow:0 2px 18px rgba(0,0,0,0.08);
+}
 
-    /* ── Menu Button ── */
+.top-header h1{
+  font-size:20px;
+  font-weight:700;
+  color:#111;
+}
 
-    .menu-btn{
-      position:fixed;
-      top:15px;
-      left:15px;
+.top-header p{
+  margin-top:4px;
+  font-size:13px;
+  color:#777;
+}
 
-      z-index:1001;
+/* ───────────────── MENU BUTTON ───────────────── */
 
-      width:44px;
-      height:44px;
+.menu-btn{
+  position:fixed;
+  top:22px;
+  left:18px;
 
-      border:none;
-      border-radius:10px;
+  z-index:1300;
 
-      background:white;
+  width:44px;
+  height:44px;
 
-      font-size:22px;
+  border:none;
+  border-radius:14px;
 
-      cursor:pointer;
+  background:white;
 
-      box-shadow:0 2px 10px rgba(0,0,0,0.15);
-    }
+  font-size:20px;
+  cursor:pointer;
 
-    /* ── Menu ── */
+  box-shadow:0 4px 16px rgba(0,0,0,0.12);
+}
 
-    .menu{
-      position:fixed;
-      top:0;
-      left:-260px;
+/* ───────────────── LOCATION BUTTON ───────────────── */
 
-      width:250px;
-      height:100%;
+.locate-btn{
+  position:fixed;
+  top:115px;
+  right:18px;
 
-      background:white;
+  z-index:1200;
 
-      z-index:1002;
+  border:none;
+  border-radius:18px;
 
-      padding:28px 20px;
+  background:white;
 
-      transition:0.3s ease;
+  padding:16px 20px;
 
-      box-shadow:2px 0 16px rgba(0,0,0,0.18);
-    }
+  font-size:16px;
+  font-weight:600;
 
-    .menu.open{
-      left:0;
-    }
+  display:flex;
+  align-items:center;
+  gap:12px;
 
-    .menu h3{
-      margin:0;
-      color:#007bff;
-      font-size:22px;
-    }
+  cursor:pointer;
 
-    .menu p{
-      margin-top:4px;
-      color:#888;
-      font-size:13px;
-    }
+  box-shadow:0 6px 18px rgba(0,0,0,0.12);
+}
 
-    .menu hr{
-      border:none;
-      border-top:1px solid #eee;
-      margin:18px 0;
-    }
+.locate-btn i{
+  font-size:20px;
+}
 
-    .menu-item{
-      display:flex;
-      align-items:center;
+/* ───────────────── SIDE MENU ───────────────── */
 
-      padding:12px 8px;
+.menu{
+  position:fixed;
+  top:0;
+  left:-280px;
 
-      border-radius:10px;
+  width:260px;
+  height:100vh;
 
-      cursor:pointer;
+  background:white;
 
-      transition:0.2s;
-    }
+  z-index:1400;
 
-    .menu-item:hover{
-      background:#f5f5f5;
-    }
+  padding:26px 20px;
 
-    .coming{
-      margin-left:auto;
-      font-size:11px;
-      color:#aaa;
-    }
+  transition:0.35s ease;
 
-    .menu-overlay{
-      position:fixed;
-      inset:0;
+  box-shadow:2px 0 20px rgba(0,0,0,0.15);
+}
 
-      z-index:1001;
+.menu.open{
+  left:0;
+}
 
-      display:none;
-    }
+.menu h2{
+  color:#111;
+  font-size:24px;
+}
 
-    .menu-overlay.show{
-      display:block;
-    }
+.menu p{
+  margin-top:4px;
+  color:#777;
+  font-size:13px;
+}
 
-    /* ── Issue Panel ── */
+.menu hr{
+  border:none;
+  border-top:1px solid #eee;
+  margin:20px 0;
+}
 
-    .issue-panel{
-      position:fixed;
-      left:0;
-      right:0;
-      bottom:0;
+.menu-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
 
-      background:white;
+  padding:14px;
 
-      z-index:1000;
+  border-radius:14px;
 
-      padding:20px 16px 34px;
+  cursor:pointer;
 
-      border-radius:20px 20px 0 0;
+  transition:0.2s;
+}
 
-      transform:translateY(100%);
-      transition:0.35s cubic-bezier(0.32,0.72,0,1);
+.menu-item:hover{
+  background:#f5f5f5;
+}
 
-      box-shadow:0 -6px 30px rgba(0,0,0,0.15);
-    }
+.menu-item i{
+  width:22px;
+}
 
-    .issue-panel.active{
-      transform:translateY(0);
-    }
+.menu-overlay{
+  position:fixed;
+  inset:0;
 
-    .panel-handle{
-      width:40px;
-      height:4px;
+  z-index:1350;
 
-      margin:0 auto 14px;
+  background:rgba(0,0,0,0.25);
 
-      background:#ddd;
+  opacity:0;
+  pointer-events:none;
 
-      border-radius:2px;
-    }
+  transition:0.25s;
+}
 
-    .issue-panel h3{
-      margin:0 0 14px;
-    }
+.menu-overlay.show{
+  opacity:1;
+  pointer-events:auto;
+}
 
-    /* ── Type Grid ── */
+/* ───────────────── BOTTOM ISSUE BAR ───────────────── */
 
-    .type-grid{
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:8px;
+.bottom-panel{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
 
-      margin-bottom:14px;
-    }
+  z-index:1200;
 
-    .type-btn{
-      border:2px solid #e0e0e0;
-      background:white;
+  background:white;
 
-      border-radius:12px;
+  padding:18px 14px 26px;
 
-      padding:10px 4px;
+  border-radius:26px 26px 0 0;
 
-      font-size:11px;
+  box-shadow:0 -8px 30px rgba(0,0,0,0.14);
+}
 
-      cursor:pointer;
+.issue-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+}
 
-      transition:0.2s;
-    }
+.issue-btn{
+  border:none;
 
-    .type-btn.selected{
-      border-color:#007bff;
-      background:#e8f0fe;
-      color:#007bff;
-      font-weight:600;
-    }
+  border-radius:18px;
 
-    /* ── Textarea ── */
+  color:white;
 
-    textarea{
-      width:100%;
+  height:92px;
 
-      border:2px solid #e0e0e0;
-      border-radius:10px;
+  font-size:14px;
+  font-weight:700;
 
-      padding:12px;
+  cursor:pointer;
 
-      font-size:14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
 
-      resize:none;
+  transition:0.2s;
+}
 
-      outline:none;
+.issue-btn i{
+  font-size:24px;
+}
 
-      margin-bottom:12px;
-    }
+.issue-btn:hover{
+  transform:translateY(-2px);
+}
 
-    textarea:focus{
-      border-color:#007bff;
-    }
+.issue-btn.selected{
+  outline:4px solid rgba(255,255,255,0.8);
+  transform:scale(1.03);
+}
 
-    /* ── Photo Upload ── */
+.pothole{
+  background:#ff7300;
+}
 
-    .photo-label{
-      display:flex;
-      align-items:center;
-      justify-content:center;
+.dumping{
+  background:#ff2341;
+}
 
-      border:2px dashed #ccc;
-      border-radius:10px;
+.sewage{
+  background:#287bff;
+}
 
-      padding:12px;
+.light{
+  background:#f2b600;
+}
 
-      margin-bottom:12px;
+.other{
+  background:#7b8190;
+}
 
-      cursor:pointer;
+.report-count{
+  text-align:center;
+  margin-top:18px;
+  color:#666;
+  font-size:14px;
+}
 
-      font-size:14px;
-      font-weight:600;
+/* ───────────────── REPORT MODAL ───────────────── */
 
-      color:#666;
+.report-modal{
+  position:fixed;
+  inset:0;
 
-      transition:0.2s;
-    }
+  z-index:1600;
 
-    .photo-label:hover{
-      border-color:#007bff;
-      color:#007bff;
-    }
+  display:flex;
+  align-items:flex-end;
 
-    #photoPreview img{
-      width:100%;
-      max-height:180px;
+  background:rgba(0,0,0,0.35);
 
-      object-fit:cover;
+  opacity:0;
+  pointer-events:none;
 
-      border-radius:10px;
+  transition:0.25s;
+}
 
-      margin-bottom:12px;
-    }
+.report-modal.active{
+  opacity:1;
+  pointer-events:auto;
+}
 
-    /* ── Buttons ── */
+.report-card{
+  width:100%;
 
-    .panel-actions{
-      display:flex;
-      gap:8px;
-    }
+  background:white;
 
-    .panel-actions button{
-      flex:1;
+  border-radius:28px 28px 0 0;
 
-      padding:13px;
+  padding:24px 18px 34px;
 
-      border:none;
-      border-radius:10px;
+  transform:translateY(100%);
+  transition:0.35s cubic-bezier(0.32,0.72,0,1);
+}
 
-      font-size:14px;
-      font-weight:600;
+.report-modal.active .report-card{
+  transform:translateY(0);
+}
 
-      cursor:pointer;
-    }
+.drag-line{
+  width:50px;
+  height:5px;
 
-    #submitBtn{
-      background:#007bff;
-      color:white;
-    }
+  background:#ddd;
 
-    #cancelBtn{
-      background:#f0f0f0;
-      color:#555;
-    }
+  border-radius:999px;
 
-    /* ── Emoji Markers ── */
+  margin:0 auto 18px;
+}
 
-    .emoji-marker div{
-      width:40px;
-      height:40px;
+.report-card h3{
+  margin-bottom:14px;
+  font-size:20px;
+}
 
-      display:flex;
-      align-items:center;
-      justify-content:center;
+textarea{
+  width:100%;
+  border:2px solid #e5e5e5;
+  border-radius:16px;
 
-      font-size:28px;
+  padding:14px;
 
-      background:white;
+  font-size:15px;
 
-      border-radius:50%;
+  resize:none;
+  outline:none;
 
-      border:2px solid white;
+  margin-bottom:14px;
+}
 
-      box-shadow:0 2px 10px rgba(0,0,0,0.25);
-    }
+textarea:focus{
+  border-color:#287bff;
+}
 
-    /* ── Toast ── */
+.photo-btn{
+  width:100%;
 
-    .toast{
-      position:fixed;
-      bottom:90px;
-      left:50%;
+  border:2px dashed #ccc;
+  border-radius:16px;
 
-      transform:translateX(-50%);
+  padding:16px;
 
-      background:#111;
-      color:white;
+  background:#fafafa;
 
-      padding:10px 20px;
+  cursor:pointer;
 
-      border-radius:999px;
+  text-align:center;
 
-      font-size:13px;
-      font-weight:600;
+  font-weight:600;
 
-      opacity:0;
+  color:#666;
 
-      transition:0.3s;
+  margin-bottom:14px;
+}
 
-      z-index:3000;
-    }
+.photo-btn:hover{
+  border-color:#287bff;
+  color:#287bff;
+}
 
-    .toast.show{
-      opacity:1;
-    }
+#photoPreview{
+  display:none;
+  margin-bottom:14px;
+}
 
-  </style>
+#photoPreview img{
+  width:100%;
+  max-height:220px;
+  object-fit:cover;
+  border-radius:16px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:12px;
+}
+
+.modal-actions button{
+  flex:1;
+
+  border:none;
+  border-radius:16px;
+
+  padding:15px;
+
+  font-size:15px;
+  font-weight:700;
+
+  cursor:pointer;
+}
+
+.cancel-btn{
+  background:#efefef;
+}
+
+.submit-btn{
+  background:#287bff;
+  color:white;
+}
+
+/* ───────────────── ISSUE MARKERS ───────────────── */
+
+.custom-marker{
+  width:54px;
+  height:54px;
+
+  border-radius:50%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:white;
+  font-size:24px;
+
+  border:4px solid white;
+
+  box-shadow:0 6px 18px rgba(0,0,0,0.25);
+}
+
+.orange{
+  background:#ff7300;
+}
+
+.red{
+  background:#ff2341;
+}
+
+.blue{
+  background:#287bff;
+}
+
+.yellow{
+  background:#f2b600;
+}
+
+.gray{
+  background:#7b8190;
+}
+
+/* ───────────────── USER LOCATION ───────────────── */
+
+.user-location{
+  width:22px;
+  height:22px;
+
+  background:#287bff;
+
+  border-radius:50%;
+
+  border:4px solid white;
+
+  box-shadow:0 0 0 10px rgba(40,123,255,0.2);
+}
+
+/* ───────────────── TOAST ───────────────── */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:150px;
+
+  transform:translateX(-50%);
+
+  z-index:2000;
+
+  background:#111;
+  color:white;
+
+  padding:12px 22px;
+
+  border-radius:999px;
+
+  font-size:14px;
+  font-weight:600;
+
+  opacity:0;
+
+  transition:0.3s;
+}
+
+.toast.show{
+  opacity:1;
+}
+
+/* ───────────────── MOBILE ───────────────── */
+
+@media(max-width:700px){
+
+  .issue-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .issue-btn{
+    height:85px;
+  }
+
+}
+
+</style>
 </head>
 
 <body>
 
-  <div id="map"></div>
+<!-- MAP -->
 
-  <div class="toast" id="toast"></div>
+<div id="map"></div>
 
-  <button class="locate-btn" id="locateBtn">
-    📍 Find My Location
-  </button>
+<!-- HEADER -->
 
-  <button class="menu-btn" id="menuBtn">
-    ☰
-  </button>
+<div class="top-header">
 
-  <div class="menu-overlay" id="menuOverlay"></div>
+  <h1>Community Issue Reporter</h1>
 
-  <!-- Side Menu -->
+  <p>Select an issue type below, then click on the map</p>
 
-  <div class="menu" id="menu">
+</div>
 
-    <h3>🗺️ CityWatch</h3>
+<!-- MENU BUTTON -->
 
-    <p>Community Issue Map</p>
+<button class="menu-btn" id="menuBtn">
+  ☰
+</button>
 
-    <hr>
+<!-- LOCATE -->
 
-    <div class="menu-item">
-      📍 Report an Issue
-    </div>
+<button class="locate-btn" id="locateBtn">
 
-    <div class="menu-item">
-      📊 Stats
-      <span class="coming">coming soon</span>
-    </div>
+  <i class="fa-solid fa-location-arrow"></i>
 
-    <div class="menu-item">
-      🎛️ Filters
-      <span class="coming">coming soon</span>
-    </div>
+  Find My Location
 
-    <hr>
+</button>
 
-    <div style="font-size:12px;color:#aaa;">
-      More features coming soon...
-    </div>
+<!-- SIDE MENU -->
+
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<div class="menu" id="menu">
+
+  <h2>CityWatch</h2>
+
+  <p>Community Monitoring System</p>
+
+  <hr>
+
+  <div class="menu-item">
+    <i class="fa-solid fa-map-location-dot"></i>
+    Report Issue
+  </div>
+
+  <div class="menu-item">
+    <i class="fa-solid fa-chart-simple"></i>
+    Statistics
+  </div>
+
+  <div class="menu-item">
+    <i class="fa-solid fa-filter"></i>
+    Filters
+  </div>
+
+  <div class="menu-item">
+    <i class="fa-solid fa-gear"></i>
+    Settings
+  </div>
+
+</div>
+
+<!-- BOTTOM BAR -->
+
+<div class="bottom-panel">
+
+  <div class="issue-grid">
+
+    <button
+      class="issue-btn pothole"
+      data-type="Pothole"
+    >
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      Pothole
+    </button>
+
+    <button
+      class="issue-btn dumping"
+      data-type="Illegal Dumping"
+    >
+      <i class="fa-solid fa-trash"></i>
+      Illegal Dumping
+    </button>
+
+    <button
+      class="issue-btn sewage"
+      data-type="Sewage Leak"
+    >
+      <i class="fa-solid fa-droplet"></i>
+      Sewage Leak
+    </button>
+
+    <button
+      class="issue-btn light"
+      data-type="Street Light"
+    >
+      <i class="fa-regular fa-lightbulb"></i>
+      Street Light
+    </button>
+
+    <button
+      class="issue-btn other"
+      data-type="Other Issue"
+    >
+      <i class="fa-solid fa-plus"></i>
+      Other Issue
+    </button>
 
   </div>
 
-  <!-- Issue Panel -->
+  <div class="report-count" id="reportCount">
+    📍 0 issues reported
+  </div>
 
-  <div class="issue-panel" id="panel">
+</div>
 
-    <div class="panel-handle"></div>
+<!-- REPORT MODAL -->
 
-    <h3>📌 Report an Issue</h3>
+<div class="report-modal" id="reportModal">
 
-    <div class="type-grid">
+  <div class="report-card">
 
-      <button class="type-btn" data-type="Pothole">
-        🕳️<br>Pothole
-      </button>
+    <div class="drag-line"></div>
 
-      <button class="type-btn" data-type="Trash">
-        🗑️<br>Trash
-      </button>
-
-      <button class="type-btn" data-type="Leak">
-        💧<br>Leak
-      </button>
-
-      <button class="type-btn" data-type="Light">
-        💡<br>Light
-      </button>
-
-      <button class="type-btn" data-type="Other">
-        ⚠️<br>Other
-      </button>
-
-    </div>
+    <h3>Report Issue</h3>
 
     <textarea
-      id="desc"
-      rows="3"
+      id="description"
+      rows="4"
       placeholder="Describe the issue..."
     ></textarea>
 
-    <!-- Photo Upload -->
-
-    <label class="photo-label" for="photoInput">
+    <label class="photo-btn" for="photoInput">
       📷 Take / Upload Photo
     </label>
 
     <input
       type="file"
-      id="photoInput"
       accept="image/*"
       capture="environment"
+      id="photoInput"
       hidden
     >
 
-    <div id="photoPreview" style="display:none;">
+    <div id="photoPreview">
       <img id="previewImg">
     </div>
 
-    <div class="panel-actions">
+    <div class="modal-actions">
 
-      <button id="cancelBtn">
+      <button
+        class="cancel-btn"
+        id="cancelBtn"
+      >
         Cancel
       </button>
 
-      <button id="submitBtn">
+      <button
+        class="submit-btn"
+        id="submitBtn"
+      >
         Submit Report
       </button>
 
@@ -497,333 +711,457 @@
 
   </div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</div>
 
-  <script type="module">
+<!-- TOAST -->
 
-    import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+<div class="toast" id="toast"></div>
 
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      onSnapshot
-    }
-    from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-    /* ── Firebase ── */
+<script type="module">
 
-    const firebaseConfig = {
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 
-      apiKey:"AIzaSyBT8j239aELPwxD0iQcQj6fdnhQVHNuMLU",
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot
+}
+from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-      authDomain:"community-map-125ba.firebaseapp.com",
+/* ───────────────── FIREBASE ───────────────── */
 
-      projectId:"community-map-125ba",
+const firebaseConfig = {
 
-      storageBucket:"community-map-125ba.firebasestorage.app",
+  apiKey:"YOUR_API_KEY",
 
-      messagingSenderId:"1016337399487",
+  authDomain:"YOUR_AUTH_DOMAIN",
 
-      appId:"1:1016337399487:web:77ba8a7b8c89fd850fd00a",
-      measurementId: "G-7NYRJ3B89Q",
+  projectId:"YOUR_PROJECT_ID",
 
-    };
+  storageBucket:"YOUR_STORAGE_BUCKET",
 
-    const app = initializeApp(firebaseConfig);
+  messagingSenderId:"YOUR_SENDER_ID",
 
-    const db = getFirestore(app);
+  appId:"YOUR_APP_ID"
 
-    const reportsRef = collection(db,"reports");
+};
 
-    /* ── Map ── */
+const app = initializeApp(firebaseConfig);
 
-    const map = L.map("map")
-      .setView([-26.2041,28.0473],13);
+const db = getFirestore(app);
 
-    L.tileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        attribution:"© OpenStreetMap contributors"
-      }
-    ).addTo(map);
+const reportsRef = collection(db,"reports");
 
-    /* ── Emoji Icons ── */
+/* ───────────────── MAP ───────────────── */
 
-    function createEmojiIcon(emoji){
+const map = L.map("map",{
+  zoomControl:false
+})
+.setView([-26.2041,28.0473],13);
 
-      return L.divIcon({
+L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    attribution:"© OpenStreetMap"
+  }
+).addTo(map);
 
-        className:"emoji-marker",
+/* ───────────────── ISSUE ICONS ───────────────── */
 
-        html:`<div>${emoji}</div>`,
+function createMarker(color,icon){
 
-        iconSize:[40,40],
+  return L.divIcon({
 
-        iconAnchor:[20,20],
+    className:"",
 
-        popupAnchor:[0,-20]
+    html:`
+      <div class="custom-marker ${color}">
+        <i class="${icon}"></i>
+      </div>
+    `,
 
-      });
+    iconSize:[54,54],
 
-    }
+    iconAnchor:[27,27],
 
-    const icons = {
+    popupAnchor:[0,-24]
 
-      Pothole:createEmojiIcon("🕳️"),
+  });
 
-      Trash:createEmojiIcon("🗑️"),
+}
 
-      Leak:createEmojiIcon("💧"),
+const markerIcons = {
 
-      Light:createEmojiIcon("💡"),
+  "Pothole":
+    createMarker(
+      "orange",
+      "fa-solid fa-triangle-exclamation"
+    ),
 
-      Other:createEmojiIcon("⚠️")
+  "Illegal Dumping":
+    createMarker(
+      "red",
+      "fa-solid fa-trash"
+    ),
 
-    };
+  "Sewage Leak":
+    createMarker(
+      "blue",
+      "fa-solid fa-droplet"
+    ),
 
-    /* ── Real-Time Reports ── */
+  "Street Light":
+    createMarker(
+      "yellow",
+      "fa-regular fa-lightbulb"
+    ),
 
-    onSnapshot(reportsRef,snapshot=>{
+  "Other Issue":
+    createMarker(
+      "gray",
+      "fa-solid fa-plus"
+    )
 
-      snapshot.docChanges().forEach(change=>{
+};
 
-        if(change.type==="added"){
+/* ───────────────── REALTIME REPORTS ───────────────── */
 
-          const r = change.doc.data();
+let reportCounter = 0;
 
-          L.marker(
-            [r.lat,r.lng],
-            {
-              icon:icons[r.type] || icons.Other
-            }
-          )
-          .addTo(map)
-          .bindPopup(`
+onSnapshot(reportsRef,snapshot=>{
 
-            <b>${r.type}</b><br>
+  snapshot.docChanges().forEach(change=>{
 
-            ${r.description}
+    if(change.type === "added"){
 
-            ${
-              r.photoUrl
-              ? `<br><img
-                  src="${r.photoUrl}"
-                  style="
-                    width:100%;
-                    margin-top:8px;
-                    border-radius:8px;
-                  "
-                >`
-              : ""
-            }
+      const r = change.doc.data();
 
-          `);
+      reportCounter++;
 
+      document.getElementById("reportCount")
+      .innerHTML =
+      `📍 ${reportCounter} issues reported`;
+
+      L.marker(
+        [r.lat,r.lng],
+        {
+          icon:
+            markerIcons[r.type]
+            || markerIcons["Other Issue"]
         }
+      )
+      .addTo(map)
+      .bindPopup(`
 
-      });
+        <div style="min-width:180px;">
 
-    });
+          <b style="font-size:16px;">
+            ${r.type}
+          </b>
 
-    /* ── Menu ── */
+          <br><br>
 
-    const menu = document.getElementById("menu");
+          ${r.description}
 
-    const overlay =
-      document.getElementById("menuOverlay");
+          ${
+            r.photoUrl
+            ?
+            `
+            <br><br>
 
-    document.getElementById("menuBtn").onclick=()=>{
+            <img
+              src="${r.photoUrl}"
+              style="
+                width:100%;
+                border-radius:12px;
+              "
+            >
+            `
+            :
+            ""
+          }
 
-      menu.classList.toggle("open");
+        </div>
 
-      overlay.classList.toggle("show");
+      `);
 
-    };
+    }
 
-    overlay.onclick=()=>{
+  });
 
-      menu.classList.remove("open");
+});
 
-      overlay.classList.remove("show");
+/* ───────────────── MENU ───────────────── */
 
-    };
+const menu =
+document.getElementById("menu");
 
-    /* ── User Location ── */
+const overlay =
+document.getElementById("menuOverlay");
 
-    document.getElementById("locateBtn").onclick=()=>{
+document.getElementById("menuBtn")
+.onclick=()=>{
 
-      navigator.geolocation.getCurrentPosition(pos=>{
+  menu.classList.toggle("open");
 
-        const lat = pos.coords.latitude;
+  overlay.classList.toggle("show");
 
-        const lng = pos.coords.longitude;
+};
 
-        map.setView([lat,lng],17);
+overlay.onclick=()=>{
 
-        L.circleMarker(
+  menu.classList.remove("open");
+
+  overlay.classList.remove("show");
+
+};
+
+/* ───────────────── LOCATION TRACKING ───────────────── */
+
+let userMarker = null;
+
+document.getElementById("locateBtn")
+.onclick=()=>{
+
+  if(!navigator.geolocation){
+
+    showToast("Geolocation not supported");
+
+    return;
+
+  }
+
+  navigator.geolocation.watchPosition(
+
+    position=>{
+
+      const lat =
+      position.coords.latitude;
+
+      const lng =
+      position.coords.longitude;
+
+      map.setView([lat,lng],17);
+
+      if(!userMarker){
+
+        userMarker = L.marker(
           [lat,lng],
           {
-            radius:10,
-            color:"#007bff",
-            fillColor:"#007bff",
-            fillOpacity:1
+            icon:L.divIcon({
+
+              className:"",
+
+              html:`
+                <div class="user-location"></div>
+              `,
+
+              iconSize:[22,22],
+
+              iconAnchor:[11,11]
+
+            })
           }
-        )
-        .addTo(map)
-        .bindPopup("📍 You are here")
-        .openPopup();
-
-      });
-
-    };
-
-    /* ── Report System ── */
-
-    let pendingLocation = null;
-
-    let selectedType = "Other";
-
-    let photoBase64 = null;
-
-    const photoInput =
-      document.getElementById("photoInput");
-
-    const previewImg =
-      document.getElementById("previewImg");
-
-    const photoPreview =
-      document.getElementById("photoPreview");
-
-    photoInput.onchange=()=>{
-
-      const file = photoInput.files[0];
-
-      if(!file) return;
-
-      const reader = new FileReader();
-
-      reader.onload=e=>{
-
-        photoBase64 = e.target.result;
-
-        previewImg.src = photoBase64;
-
-        photoPreview.style.display="block";
-
-      };
-
-      reader.readAsDataURL(file);
-
-    };
-
-    document.querySelectorAll(".type-btn")
-    .forEach(btn=>{
-
-      btn.onclick=()=>{
-
-        document.querySelectorAll(".type-btn")
-        .forEach(b=>b.classList.remove("selected"));
-
-        btn.classList.add("selected");
-
-        selectedType = btn.dataset.type;
-
-      };
-
-    });
-
-    map.on("click",e=>{
-
-      pendingLocation = e.latlng;
-
-      document.getElementById("desc").value="";
-
-      document.getElementById("panel")
-      .classList.add("active");
-
-    });
-
-    document.getElementById("cancelBtn").onclick=()=>{
-
-      document.getElementById("panel")
-      .classList.remove("active");
-
-    };
-
-    document.getElementById("submitBtn").onclick=async()=>{
-
-      const desc =
-        document.getElementById("desc")
-        .value
-        .trim();
-
-      if(!pendingLocation) return;
-
-      if(!desc){
-
-        showToast("Please describe the issue.");
-
-        return;
+        ).addTo(map);
 
       }
 
-      try{
+      else{
 
-        await addDoc(reportsRef,{
-
-          type:selectedType,
-
-          description:desc,
-
-          lat:pendingLocation.lat,
-
-          lng:pendingLocation.lng,
-
-          photoUrl:photoBase64 || null,
-
-          timestamp:new Date().toISOString()
-
-        });
-
-        document.getElementById("panel")
-        .classList.remove("active");
-
-        showToast("✅ Report submitted!");
+        userMarker.setLatLng([lat,lng]);
 
       }
 
-      catch(err){
+    },
 
-        console.error(err);
+    err=>{
 
-        showToast("❌ Error submitting report");
+      console.error(err);
 
-      }
+      showToast("Location permission denied");
 
-    };
+    },
 
-    /* ── Toast ── */
-
-    function showToast(msg){
-
-      const toast =
-        document.getElementById("toast");
-
-      toast.textContent = msg;
-
-      toast.classList.add("show");
-
-      setTimeout(()=>{
-
-        toast.classList.remove("show");
-
-      },3000);
-
+    {
+      enableHighAccuracy:true,
+      maximumAge:0,
+      timeout:15000
     }
 
-  </script>
+  );
+
+};
+
+/* ───────────────── REPORT SYSTEM ───────────────── */
+
+let selectedType = "Pothole";
+
+let pendingLatLng = null;
+
+let photoBase64 = null;
+
+document.querySelectorAll(".issue-btn")
+.forEach(btn=>{
+
+  btn.onclick=()=>{
+
+    document.querySelectorAll(".issue-btn")
+    .forEach(b=>b.classList.remove("selected"));
+
+    btn.classList.add("selected");
+
+    selectedType = btn.dataset.type;
+
+    showToast(
+      `${selectedType} selected`
+    );
+
+  };
+
+});
+
+document.querySelector(".issue-btn")
+.classList.add("selected");
+
+map.on("click",e=>{
+
+  pendingLatLng = e.latlng;
+
+  document.getElementById("reportModal")
+  .classList.add("active");
+
+});
+
+/* ───────────────── PHOTO ───────────────── */
+
+const photoInput =
+document.getElementById("photoInput");
+
+photoInput.onchange=()=>{
+
+  const file = photoInput.files[0];
+
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload=e=>{
+
+    photoBase64 = e.target.result;
+
+    document.getElementById("previewImg")
+    .src = photoBase64;
+
+    document.getElementById("photoPreview")
+    .style.display = "block";
+
+  };
+
+  reader.readAsDataURL(file);
+
+};
+
+/* ───────────────── SUBMIT ───────────────── */
+
+document.getElementById("cancelBtn")
+.onclick=()=>{
+
+  document.getElementById("reportModal")
+  .classList.remove("active");
+
+};
+
+document.getElementById("submitBtn")
+.onclick=async()=>{
+
+  if(!pendingLatLng){
+
+    showToast("Select a location");
+
+    return;
+
+  }
+
+  const description =
+  document.getElementById("description")
+  .value
+  .trim();
+
+  if(!description){
+
+    showToast("Describe the issue");
+
+    return;
+
+  }
+
+  try{
+
+    await addDoc(reportsRef,{
+
+      type:selectedType,
+
+      description,
+
+      lat:pendingLatLng.lat,
+
+      lng:pendingLatLng.lng,
+
+      photoUrl:photoBase64 || null,
+
+      timestamp:new Date().toISOString()
+
+    });
+
+    document.getElementById("reportModal")
+    .classList.remove("active");
+
+    document.getElementById("description")
+    .value = "";
+
+    document.getElementById("photoPreview")
+    .style.display = "none";
+
+    photoBase64 = null;
+
+    showToast("✅ Report submitted");
+
+  }
+
+  catch(err){
+
+    console.error(err);
+
+    showToast("❌ Failed to submit");
+
+  }
+
+};
+
+/* ───────────────── TOAST ───────────────── */
+
+function showToast(msg){
+
+  const toast =
+  document.getElementById("toast");
+
+  toast.textContent = msg;
+
+  toast.classList.add("show");
+
+  setTimeout(()=>{
+
+    toast.classList.remove("show");
+
+  },3000);
+
+}
+
+</script>
 
 </body>
 </html>
