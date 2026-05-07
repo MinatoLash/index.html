@@ -60,9 +60,10 @@
   <div class="container">
     <div class="card">
       <h1>Community Live Map</h1>
-      <p>Track your live location and follow movement on the map.</p>
+      <p>Track your live location, view your personal territory zone, and follow movement on the map.</p>
       <button id="trackBtn">Start Tracking</button>
-      <div id="coords" class="coords"></div>
+            <div id="coords" class="coords"></div>
+      
     </div>
 
     <div class="card">
@@ -72,19 +73,39 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const map = L.map('map').setView([-26.2041, 28.0473], 13);
+    const map = L.map('map', { zoomControl: false }).setView([-26.2041, 28.0473], 11);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
+    
+    for (let lat = -90; lat <= 90; lat += 0.02) {
+      L.polyline([[lat, -180], [lat, 180]], {
+        color: '#cbd5e1',
+        weight: 0.5,
+        opacity: 0.3
+      }).addTo(map);
+    }
+
+    for (let lng = -180; lng <= 180; lng += 0.02) {
+      L.polyline([[-90, lng], [90, lng]], {
+        color: '#cbd5e1',
+        weight: 0.5,
+        opacity: 0.3
+      }).addTo(map);
+    }
+
     let marker = null;
+    let territoryCircle = null;
+    let outerCircle = null;
+    let zoneInitialized = false;
     let watchId = null;
     let tracking = false;
 
     const trackBtn = document.getElementById('trackBtn');
     const coordsEl = document.getElementById('coords');
-
+    
     trackBtn.addEventListener('click', () => {
       if (tracking) {
         navigator.geolocation.clearWatch(watchId);
@@ -110,7 +131,29 @@
             marker.setLatLng(coords);
           }
 
-          map.setView(coords, 16, { animate: true });
+          if (!zoneInitialized) {
+            territoryCircle = L.circle(coords, {
+              radius: 600,
+              color: '#84cc16',
+              fillColor: '#84cc16',
+              fillOpacity: 0.12,
+              weight: 2
+            }).addTo(map);
+
+            outerCircle = L.circle(coords, {
+              radius: 1400,
+              color: '#84cc16',
+              fillOpacity: 0.03,
+              weight: 2
+            }).addTo(map);
+
+            zoneInitialized = true;
+          }
+
+          if (territoryCircle) territoryCircle.setLatLng(coords);
+          if (outerCircle) outerCircle.setLatLng(coords);
+
+          map.setView(coords, 11, { animate: true });
           coordsEl.textContent = `Current Position: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
         },
         () => alert('Unable to retrieve location'),
