@@ -60,9 +60,10 @@
   <div class="container">
     <div class="card">
       <h1>Community Live Map</h1>
-      <p>Track your live location, view your personal territory zone, and follow movement on the map.</p>
+      <p>Explore your city like a live community health map. Move around neighborhoods, view area conditions, and understand where issues are concentrated.</p>
       <button id="trackBtn">Start Tracking</button>
             <div id="coords" class="coords"></div>
+      <button id="centerBtn" style="margin-top:8px; background:#0f172a;">Center On Me</button>
       
     </div>
 
@@ -78,6 +79,22 @@
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
+
+    const issueZones = [
+      { coords: [-26.205, 28.045], radius: 900, color: '#f59e0b', opacity: 0.18 },
+      { coords: [-26.208, 28.052], radius: 1200, color: '#ef4444', opacity: 0.12 },
+      { coords: [-26.201, 28.040], radius: 700, color: '#22c55e', opacity: 0.08 }
+    ];
+
+    issueZones.forEach(zone => {
+      L.circle(zone.coords, {
+        radius: zone.radius,
+        color: zone.color,
+        fillColor: zone.color,
+        fillOpacity: zone.opacity,
+        weight: 1
+      }).addTo(map);
+    });
 
     
     for (let lat = -90; lat <= 90; lat += 0.02) {
@@ -104,8 +121,15 @@
     let tracking = false;
 
     const trackBtn = document.getElementById('trackBtn');
+    const centerBtn = document.getElementById('centerBtn');
     const coordsEl = document.getElementById('coords');
     
+    centerBtn.addEventListener('click', () => {
+      if (marker) {
+        map.setView(marker.getLatLng(), 11, { animate: true });
+      }
+    });
+
     trackBtn.addEventListener('click', () => {
       if (tracking) {
         navigator.geolocation.clearWatch(watchId);
@@ -154,7 +178,7 @@
           if (outerCircle) outerCircle.setLatLng(coords);
 
           map.setView(coords, 11, { animate: true });
-          coordsEl.textContent = `Current Position: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+          coordsEl.textContent = `Current Area Center: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
         },
         () => alert('Unable to retrieve location'),
         {
