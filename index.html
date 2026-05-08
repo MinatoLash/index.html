@@ -208,8 +208,8 @@ onSnapshot(reportsRef, snapshot=>{
 
     const urgency = calculateUrgency(r);
 
-    // Resolve photo: prefer localStorage copy, fall back to Firestore field
-    const photoSrc = getPhotoLocally(id) || r.photoUrl || null;
+    // Photo is stored directly in Firestore (compressed to ~50KB)
+    const photoSrc = r.photoUrl || null;
     const photoHtml = photoSrc
       ? `<img class="popup-photo" src="${photoSrc}" alt="Report photo">`
       : "";
@@ -309,7 +309,7 @@ const photoPreview= document.getElementById("photoPreview");
 photoInput.onchange=()=>{
   const file = photoInput.files[0];
   if(!file) return;
-  if(file.size > 5*1024*1024){ showToast("Image too large (max 5MB)"); return; }
+  if(file.size > 5*1024*1024){ showToast("⚠️ Image too large (max 5MB)"); return; }
 
   const reader = new FileReader();
   reader.onload=e=>{
@@ -318,12 +318,28 @@ photoInput.onchange=()=>{
       const canvas = document.createElement("canvas");
       const ctx    = canvas.getContext("2d");
       let w=img.width, h=img.height;
-      const MAX=900;
-      if(w>h){ if(w>MAX){ h*=MAX/w; w=MAX; } } else { if(h>MAX){ w*=MAX/h; h=MAX; } }
+
+      // 400px max — keeps Firestore doc well under 1MB
+      const MAX=400;
+      if(w>h){ if(w>MAX){ h=Math.round(h*MAX/w); w=MAX; } }
+      else    { if(h>MAX){ w=Math.round(w*MAX/h); h=MAX; } }
+
       canvas.width=w; canvas.height=h;
       ctx.drawImage(img,0,0,w,h);
-      // Use quality 0.6 to keep well under Firestore's 1 MB doc limit (~430 KB safe budget)
-      photoBase64 = canvas.toDataURL("image/jpeg",0.6);
+
+      // Quality 0.3 — aggressive but fine for a map popup thumbnail
+      const compressed = canvas.toDataURL("image/jpeg",0.3);
+
+      // 700,000 base64 chars ≈ ~500KB raw — safe under Firestore's 1MB doc limit
+      if(compressed.length > 700000){
+        showToast("⚠️ Photo still too large — try a different image");
+        photoBase64 = null;
+        photoPreview.style.display="none";
+        photoInput.value="";
+        return;
+      }
+
+      photoBase64 = compressed;
       previewImg.src = photoBase64;
       photoPreview.style.display="block";
     };
@@ -358,21 +374,19 @@ document.getElementById("submitBtn").onclick=async()=>{
   if(!desc){ showToast("Please describe the issue."); return; }
 
   try{
-    // Store photo separately in localStorage to avoid Firestore 1 MB doc limit
-    const docRef = await addDoc(reportsRef,{
+    // photoBase64 is now guaranteed ≤ ~500KB raw (size guard in compression step)
+    // so it fits safely inside Firestore's 1MB document limit
+    await addDoc(reportsRef,{
       ownerId:userId,
       type:selectedType,
       description:desc,
       lat:pendingLocation.lat,
       lng:pendingLocation.lng,
-      photoUrl: null,          // always null in Firestore; photo lives in localStorage
+      photoUrl: photoBase64 || null,
       timestamp:new Date().toISOString(),
       status:"reported",
       support:0, notFixed:0, fixedVotes:0
     });
-
-    // Save photo to localStorage now that we have the doc ID
-    if(photoBase64) savePhotoLocally(docRef.id, photoBase64);
 
     document.getElementById("panel").classList.remove("active");
     photoPreview.style.display="none";
