@@ -1,1296 +1,1042 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <meta charset="UTF-8"/>
+<title>CityWatch</title>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet/dist/leaflet.css"
+/>
 
-  <title>CityWatch</title>
+<style>
 
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css"
-  />
+*{
+  box-sizing:border-box;
+}
 
-  <style>
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  overflow:hidden;
+  background:#f5f5f5;
+}
 
-    *{
-      box-sizing:border-box;
-    }
+#map{
+  width:100vw;
+  height:100vh;
+}
 
-    body{
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      overflow:hidden;
-      background:#f5f5f5;
-    }
+/* ── Locate Button ── */
 
-    #map{
-      width:100vw;
-      height:100vh;
-    }
+.locate-btn{
+  position:fixed;
+  top:15px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:1000;
 
-    /* ─────────────────────────────
-       Locate Button
-    ───────────────────────────── */
+  border:none;
+  border-radius:999px;
 
-    .locate-btn{
+  background:#007bff;
+  color:white;
 
-      position:fixed;
+  padding:10px 18px;
 
-      top:15px;
-      left:50%;
+  font-size:14px;
+  font-weight:600;
 
-      transform:translateX(-50%);
+  cursor:pointer;
 
-      z-index:1000;
+  box-shadow:0 2px 10px rgba(0,0,0,0.25);
+}
 
-      border:none;
-      border-radius:999px;
+/* ── Menu Button ── */
 
-      background:#007bff;
-      color:white;
+.menu-btn{
+  position:fixed;
+  top:15px;
+  left:15px;
 
-      padding:10px 18px;
+  z-index:1001;
 
-      font-size:14px;
-      font-weight:600;
+  width:44px;
+  height:44px;
 
-      cursor:pointer;
+  border:none;
+  border-radius:10px;
 
-      box-shadow:0 2px 10px rgba(0,0,0,0.25);
+  background:white;
 
-    }
+  font-size:22px;
 
-    /* ─────────────────────────────
-       Menu Button
-    ───────────────────────────── */
+  cursor:pointer;
 
-    .menu-btn{
+  box-shadow:0 2px 10px rgba(0,0,0,0.15);
+}
 
-      position:fixed;
+/* ── Menu ── */
 
-      top:15px;
-      left:15px;
+.menu{
+  position:fixed;
+  top:0;
+  left:-260px;
 
-      z-index:1001;
+  width:250px;
+  height:100%;
 
-      width:44px;
-      height:44px;
+  background:white;
 
-      border:none;
-      border-radius:10px;
+  z-index:1002;
 
-      background:white;
+  padding:28px 20px;
 
-      font-size:22px;
+  transition:0.3s ease;
 
-      cursor:pointer;
+  box-shadow:2px 0 16px rgba(0,0,0,0.18);
+}
 
-      box-shadow:0 2px 10px rgba(0,0,0,0.15);
+.menu.open{
+  left:0;
+}
 
-    }
+.menu h3{
+  margin:0;
+  color:#007bff;
+  font-size:22px;
+}
 
-    /* ─────────────────────────────
-       Menu
-    ───────────────────────────── */
+.menu p{
+  margin-top:4px;
+  color:#888;
+  font-size:13px;
+}
 
-    .menu{
+.menu hr{
+  border:none;
+  border-top:1px solid #eee;
+  margin:18px 0;
+}
 
-      position:fixed;
+.menu-item{
+  display:flex;
+  align-items:center;
 
-      top:0;
-      left:-260px;
+  padding:12px 8px;
 
-      width:250px;
-      height:100%;
+  border-radius:10px;
 
-      background:white;
+  cursor:pointer;
 
-      z-index:1002;
+  transition:0.2s;
+}
 
-      padding:28px 20px;
+.menu-item:hover{
+  background:#f5f5f5;
+}
 
-      transition:0.3s ease;
+.coming{
+  margin-left:auto;
+  font-size:11px;
+  color:#aaa;
+}
 
-      box-shadow:2px 0 16px rgba(0,0,0,0.18);
+.menu-overlay{
+  position:fixed;
+  inset:0;
 
-    }
+  z-index:1001;
 
-    .menu.open{
-      left:0;
-    }
+  display:none;
+}
 
-    .menu h3{
-      margin:0;
-      color:#007bff;
-      font-size:22px;
-    }
+.menu-overlay.show{
+  display:block;
+}
 
-    .menu p{
-      margin-top:4px;
-      color:#888;
-      font-size:13px;
-    }
+/* ── Issue Panel ── */
 
-    .menu hr{
-      border:none;
-      border-top:1px solid #eee;
-      margin:18px 0;
-    }
+.issue-panel{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
 
-    .menu-item{
+  background:white;
 
-      display:flex;
-      align-items:center;
+  z-index:1000;
 
-      padding:12px 8px;
+  padding:20px 16px 34px;
 
-      border-radius:10px;
+  border-radius:20px 20px 0 0;
 
-      cursor:pointer;
+  transform:translateY(100%);
+  transition:0.35s cubic-bezier(0.32,0.72,0,1);
 
-      transition:0.2s;
+  box-shadow:0 -6px 30px rgba(0,0,0,0.15);
+}
 
-    }
+.issue-panel.active{
+  transform:translateY(0);
+}
 
-    .menu-item:hover{
-      background:#f5f5f5;
-    }
+.panel-handle{
+  width:40px;
+  height:4px;
 
-    .coming{
+  margin:0 auto 14px;
 
-      margin-left:auto;
+  background:#ddd;
 
-      font-size:11px;
+  border-radius:2px;
+}
 
-      color:#aaa;
+.issue-panel h3{
+  margin:0 0 14px;
+}
 
-    }
+/* ── Type Grid ── */
 
-    .menu-overlay{
+.type-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
 
-      position:fixed;
+  margin-bottom:14px;
+}
 
-      inset:0;
+.type-btn{
+  border:2px solid #e0e0e0;
+  background:white;
 
-      z-index:1001;
+  border-radius:12px;
 
-      display:none;
+  padding:10px 4px;
 
-    }
+  font-size:11px;
 
-    .menu-overlay.show{
-      display:block;
-    }
+  cursor:pointer;
 
-    /* ─────────────────────────────
-       Issue Panel
-    ───────────────────────────── */
+  transition:0.2s;
+}
 
-    .issue-panel{
+.type-btn.selected{
+  border-color:#007bff;
+  background:#e8f0fe;
+  color:#007bff;
+  font-weight:600;
+}
 
-      position:fixed;
+/* ── Textarea ── */
 
-      left:0;
-      right:0;
-      bottom:0;
+textarea{
+  width:100%;
 
-      background:white;
+  border:2px solid #e0e0e0;
+  border-radius:10px;
 
-      z-index:1000;
+  padding:12px;
 
-      padding:20px 16px 34px;
+  font-size:14px;
 
-      border-radius:20px 20px 0 0;
+  resize:none;
 
-      transform:translateY(100%);
+  outline:none;
 
-      transition:0.35s cubic-bezier(0.32,0.72,0,1);
+  margin-bottom:12px;
+}
 
-      box-shadow:0 -6px 30px rgba(0,0,0,0.15);
+textarea:focus{
+  border-color:#007bff;
+}
 
-    }
+/* ── Photo Upload ── */
 
-    .issue-panel.active{
-      transform:translateY(0);
-    }
+.photo-label{
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-    .panel-handle{
+  border:2px dashed #ccc;
+  border-radius:10px;
 
-      width:40px;
-      height:4px;
+  padding:12px;
 
-      margin:0 auto 14px;
+  margin-bottom:12px;
 
-      background:#ddd;
+  cursor:pointer;
 
-      border-radius:2px;
+  font-size:14px;
+  font-weight:600;
 
-    }
+  color:#666;
 
-    .issue-panel h3{
-      margin:0 0 14px;
-    }
+  transition:0.2s;
+}
 
-    /* ─────────────────────────────
-       Type Grid
-    ───────────────────────────── */
+.photo-label:hover{
+  border-color:#007bff;
+  color:#007bff;
+}
 
-    .type-grid{
+#photoPreview img{
+  width:100%;
+  max-height:180px;
 
-      display:grid;
+  object-fit:cover;
 
-      grid-template-columns:repeat(5,1fr);
+  border-radius:10px;
 
-      gap:8px;
+  margin-bottom:12px;
+}
 
-      margin-bottom:14px;
+/* ── Buttons ── */
 
-    }
+.panel-actions{
+  display:flex;
+  gap:8px;
+}
 
-    .type-btn{
+.panel-actions button{
+  flex:1;
 
-      border:2px solid #e0e0e0;
+  padding:13px;
 
-      background:white;
+  border:none;
+  border-radius:10px;
 
-      border-radius:12px;
+  font-size:14px;
+  font-weight:600;
 
-      padding:10px 4px;
+  cursor:pointer;
+}
 
-      font-size:11px;
+#submitBtn{
+  background:#007bff;
+  color:white;
+}
 
-      cursor:pointer;
+#cancelBtn{
+  background:#f0f0f0;
+  color:#555;
+}
 
-      transition:0.2s;
+/* ── Status Pins ── */
 
-    }
+.pin{
+  width:48px;
+  height:48px;
 
-    .type-btn.selected{
+  border-radius:50%;
 
-      border-color:#007bff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-      background:#e8f0fe;
+  font-size:24px;
 
-      color:#007bff;
+  color:white;
 
-      font-weight:600;
+  border:3px solid white;
 
-    }
+  box-shadow:0 2px 12px rgba(0,0,0,0.3);
 
-    /* ─────────────────────────────
-       Textarea
-    ───────────────────────────── */
+  position:relative;
+}
 
-    textarea{
+.pin-label{
+  position:absolute;
+  bottom:-16px;
 
-      width:100%;
+  background:white;
 
-      border:2px solid #e0e0e0;
+  padding:2px 6px;
 
-      border-radius:10px;
+  border-radius:999px;
 
-      padding:12px;
+  font-size:10px;
+  font-weight:700;
 
-      font-size:14px;
+  color:#333;
 
-      resize:none;
+  white-space:nowrap;
+}
 
-      outline:none;
+/* ── Toast ── */
 
-      margin-bottom:12px;
+.toast{
+  position:fixed;
+  bottom:90px;
+  left:50%;
 
-    }
+  transform:translateX(-50%);
 
-    textarea:focus{
-      border-color:#007bff;
-    }
+  background:#111;
+  color:white;
 
-    /* ─────────────────────────────
-       Photo Upload
-    ───────────────────────────── */
+  padding:10px 20px;
 
-    .photo-label{
+  border-radius:999px;
 
-      display:flex;
+  font-size:13px;
+  font-weight:600;
 
-      align-items:center;
-      justify-content:center;
+  opacity:0;
 
-      border:2px dashed #ccc;
+  transition:0.3s;
 
-      border-radius:10px;
+  z-index:3000;
+}
 
-      padding:12px;
+.toast.show{
+  opacity:1;
+}
 
-      margin-bottom:12px;
+/* popup buttons */
 
-      cursor:pointer;
+.popup-btn{
+  width:100%;
+  border:none;
+  padding:8px;
+  margin-top:6px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+}
 
-      font-size:14px;
-      font-weight:600;
+.support-btn{
+  background:#e8f0fe;
+}
 
-      color:#666;
+.warn-btn{
+  background:#fff4d6;
+}
 
-      transition:0.2s;
+.fixed-btn{
+  background:#dcfce7;
+}
 
-    }
-
-    .photo-label:hover{
-
-      border-color:#007bff;
-
-      color:#007bff;
-
-    }
-
-    #photoPreview img{
-
-      width:100%;
-
-      max-height:180px;
-
-      object-fit:cover;
-
-      border-radius:10px;
-
-      margin-bottom:12px;
-
-    }
-
-    /* ─────────────────────────────
-       Buttons
-    ───────────────────────────── */
-
-    .panel-actions{
-
-      display:flex;
-
-      gap:8px;
-
-    }
-
-    .panel-actions button{
-
-      flex:1;
-
-      padding:13px;
-
-      border:none;
-
-      border-radius:10px;
-
-      font-size:14px;
-      font-weight:600;
-
-      cursor:pointer;
-
-    }
-
-    #submitBtn{
-
-      background:#007bff;
-
-      color:white;
-
-    }
-
-    #cancelBtn{
-
-      background:#f0f0f0;
-
-      color:#555;
-
-    }
-
-    /* ─────────────────────────────
-       Toast
-    ───────────────────────────── */
-
-    .toast{
-
-      position:fixed;
-
-      bottom:90px;
-      left:50%;
-
-      transform:translateX(-50%);
-
-      background:#111;
-      color:white;
-
-      padding:10px 20px;
-
-      border-radius:999px;
-
-      font-size:13px;
-      font-weight:600;
-
-      opacity:0;
-
-      transition:0.3s;
-
-      z-index:3000;
-
-    }
-
-    .toast.show{
-      opacity:1;
-    }
-
-    /* ─────────────────────────────
-       Popup Buttons
-    ───────────────────────────── */
-
-    .popup-btn{
-
-      width:100%;
-
-      margin-top:8px;
-
-      border:none;
-
-      border-radius:8px;
-
-      padding:10px;
-
-      cursor:pointer;
-
-      font-size:13px;
-
-      font-weight:600;
-
-    }
-
-    .support-btn{
-      background:#dbeafe;
-    }
-
-    .notfixed-btn{
-      background:#fef3c7;
-    }
-
-    .fixed-btn{
-      background:#dcfce7;
-    }
-
-  </style>
-
+</style>
 </head>
 
 <body>
 
-  <div id="map"></div>
-
-  <div class="toast" id="toast"></div>
-
-  <button
-    class="locate-btn"
-    id="locateBtn"
-  >
-    📍 Find My Location
-  </button>
-
-  <button
-    class="menu-btn"
-    id="menuBtn"
-  >
-    ☰
-  </button>
-
-  <div
-    class="menu-overlay"
-    id="menuOverlay"
-  ></div>
-
-  <!-- ─────────────────────────────
-       Side Menu
-  ───────────────────────────── -->
-
-  <div class="menu" id="menu">
-
-    <h3>🗺️ CityWatch</h3>
-
-    <p>Community Issue Map</p>
-
-    <hr>
-
-    <div class="menu-item">
-      📍 Report an Issue
-    </div>
-
-    <div class="menu-item">
-      📊 Stats
-      <span class="coming">coming soon</span>
-    </div>
-
-    <div class="menu-item">
-      🎛️ Filters
-      <span class="coming">coming soon</span>
-    </div>
-
-    <hr>
-
-    <div style="font-size:12px;color:#aaa;">
-      More features coming soon...
-    </div>
-
-  </div>
+<div id="map"></div>
 
-  <!-- ─────────────────────────────
-       Issue Panel
-  ───────────────────────────── -->
+<div class="toast" id="toast"></div>
 
-  <div class="issue-panel" id="panel">
+<button class="locate-btn" id="locateBtn">
+📍 Find My Location
+</button>
 
-    <div class="panel-handle"></div>
+<button class="menu-btn" id="menuBtn">
+☰
+</button>
 
-    <h3>📌 Report an Issue</h3>
+<div class="menu-overlay" id="menuOverlay"></div>
 
-    <div class="type-grid">
+<!-- MENU -->
 
-      <button
-        class="type-btn"
-        data-type="Pothole"
-      >
-        🕳️<br>Pothole
-      </button>
+<div class="menu" id="menu">
 
-      <button
-        class="type-btn"
-        data-type="Trash"
-      >
-        🗑️<br>Trash
-      </button>
+<h3>🗺️ CityWatch</h3>
 
-      <button
-        class="type-btn"
-        data-type="Leak"
-      >
-        💧<br>Leak
-      </button>
+<p>Community Issue Map</p>
 
-      <button
-        class="type-btn"
-        data-type="Light"
-      >
-        💡<br>Light
-      </button>
+<hr>
 
-      <button
-        class="type-btn"
-        data-type="Other"
-      >
-        ⚠️<br>Other
-      </button>
+<div class="menu-item">
+📍 Report an Issue
+</div>
 
-    </div>
+<div class="menu-item">
+📊 Stats
+<span class="coming">coming soon</span>
+</div>
 
-    <textarea
-      id="desc"
-      rows="3"
-      placeholder="Describe the issue..."
-    ></textarea>
+<div class="menu-item">
+🎛️ Filters
+<span class="coming">coming soon</span>
+</div>
 
-    <label
-      class="photo-label"
-      for="photoInput"
-    >
-      📷 Take / Upload Photo
-    </label>
+<hr>
 
-    <input
-      type="file"
-      id="photoInput"
-      accept="image/*"
-      capture="environment"
-      hidden
-    >
+<div style="font-size:12px;color:#aaa;">
+More features coming soon...
+</div>
 
-    <div
-      id="photoPreview"
-      style="display:none;"
-    >
-      <img id="previewImg">
-    </div>
+</div>
 
-    <div class="panel-actions">
+<!-- PANEL -->
 
-      <button id="cancelBtn">
-        Cancel
-      </button>
+<div class="issue-panel" id="panel">
 
-      <button id="submitBtn">
-        Submit Report
-      </button>
+<div class="panel-handle"></div>
 
-    </div>
+<h3>📌 Report an Issue</h3>
 
-  </div>
+<div class="type-grid">
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<button class="type-btn" data-type="Pothole">
+🕳️<br>Pothole
+</button>
 
-  <script type="module">
+<button class="type-btn" data-type="Trash">
+🗑️<br>Trash
+</button>
 
-    import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+<button class="type-btn" data-type="Leak">
+💧<br>Leak
+</button>
 
-    import {
+<button class="type-btn" data-type="Light">
+💡<br>Light
+</button>
 
-      getFirestore,
+<button class="type-btn" data-type="Other">
+⚠️<br>Other
+</button>
 
-      collection,
+</div>
 
-      addDoc,
+<textarea
+id="desc"
+rows="3"
+placeholder="Describe the issue..."
+></textarea>
 
-      onSnapshot,
+<label class="photo-label" for="photoInput">
+📷 Take / Upload Photo
+</label>
 
-      updateDoc,
+<input
+type="file"
+id="photoInput"
+accept="image/*"
+capture="environment"
+hidden
+>
 
-      doc,
+<div id="photoPreview" style="display:none;">
+<img id="previewImg">
+</div>
 
-      getDoc
+<div class="panel-actions">
 
-    }
+<button id="cancelBtn">
+Cancel
+</button>
 
-    from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+<button id="submitBtn">
+Submit Report
+</button>
 
-    /* ─────────────────────────────
-       Firebase
-    ───────────────────────────── */
+</div>
 
-    const firebaseConfig = {
+</div>
 
-      apiKey:"AIzaSyBT8j239aELPwxD0iQcQj6fdnhQVHNuMLU",
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-      authDomain:"community-map-125ba.firebaseapp.com",
+<script type="module">
 
-      projectId:"community-map-125ba",
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 
-      storageBucket:"community-map-125ba.firebasestorage.app",
+import {
+getFirestore,
+collection,
+addDoc,
+onSnapshot,
+doc,
+updateDoc,
+increment
+}
+from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-      messagingSenderId:"1016337399487",
+/* ── FIREBASE ── */
 
-      appId:"1:1016337399487:web:77ba8a7b8c89fd850fd00a",
+const firebaseConfig = {
 
-      measurementId:"G-7NYRJ3B89Q"
+apiKey:"AIzaSyBT8j239aELPwxD0iQcQj6fdnhQVHNuMLU",
 
-    };
+authDomain:"community-map-125ba.firebaseapp.com",
 
-    const app = initializeApp(firebaseConfig);
+projectId:"community-map-125ba",
 
-    const db = getFirestore(app);
+storageBucket:"community-map-125ba.firebasestorage.app",
 
-    const reportsRef = collection(db,"reports");
+messagingSenderId:"1016337399487",
 
-    /* ─────────────────────────────
-       Map
-    ───────────────────────────── */
+appId:"1:1016337399487:web:77ba8a7b8c89fd850fd00a",
 
-    const map = L.map("map")
-    .setView([-26.2041,28.0473],13);
+measurementId:"G-7NYRJ3B89Q",
 
-    L.tileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        attribution:"© OpenStreetMap contributors"
-      }
-    ).addTo(map);
+};
 
-    /* ─────────────────────────────
-       Status Color
-    ───────────────────────────── */
+const app = initializeApp(firebaseConfig);
 
-    function statusColor(status){
+const db = getFirestore(app);
 
-      if(status === "fixed"){
-        return "#22c55e";
-      }
+const reportsRef = collection(db,"reports");
 
-      if(status === "progress"){
-        return "#facc15";
-      }
+/* ── MAP ── */
 
-      return "#ef4444";
+const map = L.map("map")
+.setView([-26.2041,28.0473],13);
 
-    }
+L.tileLayer(
+"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+{
+attribution:"© OpenStreetMap contributors"
+}
+).addTo(map);
 
-    /* ─────────────────────────────
-       Urgency System
-    ───────────────────────────── */
+/* ── STATUS COLORS ── */
 
-    function urgencyLevel(report){
+function statusColor(status){
 
-      let score = 0;
+if(status === "fixed") return "#22c55e";
 
-      const ageHours =
-      (Date.now() - report.createdAt) / 3600000;
+if(status === "progress") return "#facc15";
 
-      if(ageHours > 72){
-        score += 3;
-      }
+return "#ef4444";
 
-      else if(ageHours > 24){
-        score += 2;
-      }
+}
 
-      else{
-        score += 1;
-      }
+/* ── URGENCY ── */
 
-      const support =
-      report.reactions?.support || 0;
+function calculateUrgency(report){
 
-      const notFixed =
-      report.reactions?.notFixed || 0;
+const ageHours =
+(Date.now() - new Date(report.timestamp).getTime())
+/ 3600000;
 
-      score += Math.floor(
-        (support + notFixed) / 3
-      );
+const reactions =
+(report.support || 0) +
+(report.notFixed || 0);
 
-      if(report.type === "Leak"){
-        score += 2;
-      }
+if(ageHours > 72 || reactions > 10){
+return "HIGH";
+}
 
-      if(report.type === "Pothole"){
-        score += 1;
-      }
+if(ageHours > 24 || reactions > 4){
+return "MEDIUM";
+}
 
-      if(score >= 6){
-        return "HIGH";
-      }
+return "LOW";
 
-      if(score >= 3){
-        return "MEDIUM";
-      }
+}
 
-      return "LOW";
+/* ── ICONS ── */
 
-    }
+const emojis = {
 
-    /* ─────────────────────────────
-       Marker Builder
-    ───────────────────────────── */
+Pothole:"🕳️",
 
-    function createMarker(type,status,urgency){
+Trash:"🗑️",
 
-      const emojiMap = {
+Leak:"💧",
 
-        Pothole:"🕳️",
+Light:"💡",
 
-        Trash:"🗑️",
+Other:"⚠️"
 
-        Leak:"💧",
+};
 
-        Light:"💡",
+function createPin(type,status){
 
-        Other:"⚠️"
+return L.divIcon({
 
-      };
+className:"",
 
-      return L.divIcon({
+html:`
 
-        className:"",
+<div
+class="pin"
+style="background:${statusColor(status)}"
+>
 
-        html:`
+${emojis[type] || "⚠️"}
 
-          <div style="
-            width:56px;
-            height:56px;
-            border-radius:50%;
-            background:${statusColor(status)};
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:28px;
-            border:3px solid white;
-            position:relative;
-            box-shadow:0 3px 12px rgba(0,0,0,0.25);
-          ">
+<div class="pin-label">
+${status.toUpperCase()}
+</div>
 
-            ${emojiMap[type]}
+</div>
 
-            <div style="
-              position:absolute;
-              bottom:-18px;
-              background:white;
-              padding:2px 6px;
-              border-radius:8px;
-              font-size:10px;
-              font-weight:700;
-              white-space:nowrap;
-            ">
+`,
 
-              ${status.toUpperCase()}
+iconSize:[48,48],
+iconAnchor:[24,24],
+popupAnchor:[0,-24]
 
-            </div>
+});
 
-            <div style="
-              position:absolute;
-              top:-10px;
-              right:-10px;
-              background:black;
-              color:white;
-              width:22px;
-              height:22px;
-              border-radius:50%;
-              display:flex;
-              align-items:center;
-              justify-content:center;
-              font-size:10px;
-              font-weight:700;
-            ">
+}
 
-              ${
-                urgency === "HIGH"
-                ? "!!!"
-                : urgency === "MEDIUM"
-                ? "!!"
-                : "!"
-              }
+/* ── MARKER STORAGE ── */
 
-            </div>
+const reportMarkers = {};
 
-          </div>
+/* ── REALTIME REPORTS ── */
 
-        `,
+onSnapshot(reportsRef, snapshot => {
 
-        iconSize:[56,56],
+snapshot.docChanges().forEach(change => {
 
-        iconAnchor:[28,28]
+const id = change.doc.id;
 
-      });
+const r = change.doc.data();
 
-    }
+/* REMOVE OLD */
 
-    /* ─────────────────────────────
-       Realtime Reports
-    ───────────────────────────── */
+if(reportMarkers[id]){
 
-    const markers = {};
+map.removeLayer(reportMarkers[id]);
 
-    onSnapshot(reportsRef,snapshot=>{
+delete reportMarkers[id];
 
-      snapshot.docChanges().forEach(change=>{
+}
 
-        const id = change.doc.id;
+/* ADD NEW */
 
-        const r = change.doc.data();
+if(change.type !== "removed"){
 
-        const urgency =
-        urgencyLevel(r);
+const urgency = calculateUrgency(r);
 
-        const popup = `
+const marker = L.marker(
+[r.lat,r.lng],
+{
+icon:createPin(
+r.type,
+r.status || "reported"
+)
+}
+);
 
-          <div style="min-width:220px;">
+marker.bindPopup(`
 
-            <b style="font-size:16px;">
-              ${r.type}
-            </b>
+<div style="min-width:220px">
 
-            <br><br>
+<b style="font-size:16px">
+${r.type}
+</b>
 
-            ${r.description}
+<br><br>
 
-            <br><br>
+${r.description}
 
-            <b>Status:</b>
-            ${r.status}
+<br><br>
 
-            <br>
+<b>Status:</b>
+${r.status || "reported"}
 
-            <b>Urgency:</b>
-            ${urgency}
+<br>
 
-            <br><br>
+<b>Urgency:</b>
 
-            👍 Support:
-            ${r.reactions?.support || 0}
+<span style="
+font-weight:700;
+color:
+${urgency==="HIGH"?"#ef4444":
+urgency==="MEDIUM"?"#f59e0b":
+"#22c55e"};
+">
+${urgency}
+</span>
 
-            <br>
+<br><br>
 
-            ⚠️ Not Fixed:
-            ${r.reactions?.notFixed || 0}
+👍 Support: ${r.support || 0}<br>
+⚠️ Not Fixed: ${r.notFixed || 0}<br>
+✅ Fixed Votes: ${r.fixedVotes || 0}
 
-            <br>
+<br><br>
 
-            ✅ Fixed:
-            ${r.reactions?.fixed || 0}
+<button
+class="popup-btn support-btn"
+onclick="reactToReport('${id}','support')"
+>
+👍 I support this
+</button>
 
-            <br><br>
+<button
+class="popup-btn warn-btn"
+onclick="reactToReport('${id}','notFixed')"
+>
+⚠️ This has not been fixed
+</button>
 
-            <button
-              class="popup-btn support-btn"
-              onclick="reactToReport('${id}','support')"
-            >
-              👍 I support this report
-            </button>
+<button
+class="popup-btn fixed-btn"
+onclick="reactToReport('${id}','fixedVotes')"
+>
+✅ This has been fixed
+</button>
 
-            <button
-              class="popup-btn notfixed-btn"
-              onclick="reactToReport('${id}','notFixed')"
-            >
-              ⚠️ This report has NOT been fixed
-            </button>
+${
+r.photoUrl
+? `
+<img
+src="${r.photoUrl}"
+style="
+width:100%;
+margin-top:10px;
+border-radius:10px;
+"
+>
+`
+: ""
+}
 
-            <button
-              class="popup-btn fixed-btn"
-              onclick="reactToReport('${id}','fixed')"
-            >
-              ✅ This report HAS been fixed
-            </button>
+</div>
 
-            ${
-              r.photoUrl
-              ? `
-                <br>
+`);
 
-                <img
-                  src="${r.photoUrl}"
-                  style="
-                    width:100%;
-                    margin-top:10px;
-                    border-radius:10px;
-                  "
-                >
-              `
-              : ""
-            }
+marker.addTo(map);
 
-          </div>
+reportMarkers[id] = marker;
 
-        `;
+}
 
-        if(markers[id]){
+});
 
-          map.removeLayer(markers[id]);
+});
 
-        }
+/* ── REACTIONS ── */
 
-        markers[id] = L.marker(
+window.reactToReport = async(id,field)=>{
 
-          [r.lat,r.lng],
+try{
 
-          {
+const reportDoc = doc(db,"reports",id);
 
-            icon:createMarker(
+await updateDoc(reportDoc,{
+[field]:increment(1)
+});
 
-              r.type,
+showToast("Reaction added");
 
-              r.status,
+}
 
-              urgency
+catch(err){
 
-            )
+console.error(err);
 
-          }
+showToast("Error adding reaction");
 
-        )
-        .addTo(map)
-        .bindPopup(popup);
+}
 
-      });
+};
 
-    });
+/* ── MENU ── */
 
-    /* ─────────────────────────────
-       Reactions
-    ───────────────────────────── */
+const menu = document.getElementById("menu");
 
-    window.reactToReport = async(id,type)=>{
+const overlay =
+document.getElementById("menuOverlay");
 
-      const reportDoc =
-      doc(db,"reports",id);
+document.getElementById("menuBtn").onclick=()=>{
 
-      const snap =
-      await getDoc(reportDoc);
+menu.classList.toggle("open");
 
-      const data =
-      snap.data();
+overlay.classList.toggle("show");
 
-      const reactions =
-      data.reactions || {
+};
 
-        support:0,
+overlay.onclick=()=>{
 
-        notFixed:0,
+menu.classList.remove("open");
 
-        fixed:0
+overlay.classList.remove("show");
 
-      };
+};
 
-      reactions[type]++;
+/* ── USER LOCATION ── */
 
-      let newStatus =
-      data.status || "reported";
+document.getElementById("locateBtn").onclick=()=>{
 
-      if(type === "fixed"){
+navigator.geolocation.getCurrentPosition(pos=>{
 
-        newStatus = "fixed";
+const lat = pos.coords.latitude;
 
-      }
+const lng = pos.coords.longitude;
 
-      else if(type === "notFixed"){
+map.setView([lat,lng],17);
 
-        newStatus = "progress";
+L.circleMarker(
+[lat,lng],
+{
+radius:10,
+color:"#007bff",
+fillColor:"#007bff",
+fillOpacity:1
+}
+)
+.addTo(map)
+.bindPopup("📍 You are here")
+.openPopup();
 
-      }
+});
 
-      await updateDoc(reportDoc,{
+};
 
-        reactions,
+/* ── REPORT SYSTEM ── */
 
-        status:newStatus
+let pendingLocation = null;
 
-      });
+let selectedType = "Other";
 
-      showToast("Reaction added");
+let photoBase64 = null;
 
-    };
+const photoInput =
+document.getElementById("photoInput");
 
-    /* ─────────────────────────────
-       Menu
-    ───────────────────────────── */
+const previewImg =
+document.getElementById("previewImg");
 
-    const menu =
-    document.getElementById("menu");
+const photoPreview =
+document.getElementById("photoPreview");
 
-    const overlay =
-    document.getElementById("menuOverlay");
+photoInput.onchange=()=>{
 
-    document.getElementById("menuBtn").onclick=()=>{
+const file = photoInput.files[0];
 
-      menu.classList.toggle("open");
+if(!file) return;
 
-      overlay.classList.toggle("show");
+const reader = new FileReader();
 
-    };
+reader.onload=e=>{
 
-    overlay.onclick=()=>{
+photoBase64 = e.target.result;
 
-      menu.classList.remove("open");
+previewImg.src = photoBase64;
 
-      overlay.classList.remove("show");
+photoPreview.style.display="block";
 
-    };
+};
 
-    /* ─────────────────────────────
-       User Location
-    ───────────────────────────── */
+reader.readAsDataURL(file);
 
-    document.getElementById("locateBtn").onclick=()=>{
+};
 
-      navigator.geolocation.getCurrentPosition(pos=>{
+document.querySelectorAll(".type-btn")
+.forEach(btn=>{
 
-        const lat = pos.coords.latitude;
+btn.onclick=()=>{
 
-        const lng = pos.coords.longitude;
+document.querySelectorAll(".type-btn")
+.forEach(b=>b.classList.remove("selected"));
 
-        map.setView([lat,lng],17);
+btn.classList.add("selected");
 
-        L.circleMarker(
-          [lat,lng],
-          {
-            radius:10,
-            color:"#007bff",
-            fillColor:"#007bff",
-            fillOpacity:1
-          }
-        )
-        .addTo(map)
-        .bindPopup("📍 You are here")
-        .openPopup();
+selectedType = btn.dataset.type;
 
-      });
+};
 
-    };
+});
 
-    /* ─────────────────────────────
-       Report System
-    ───────────────────────────── */
+map.on("click",e=>{
 
-    let pendingLocation = null;
+pendingLocation = e.latlng;
 
-    let selectedType = "Other";
+document.getElementById("desc").value="";
 
-    let photoBase64 = null;
+document.getElementById("panel")
+.classList.add("active");
 
-    const photoInput =
-    document.getElementById("photoInput");
+});
 
-    const previewImg =
-    document.getElementById("previewImg");
+document.getElementById("cancelBtn").onclick=()=>{
 
-    const photoPreview =
-    document.getElementById("photoPreview");
+document.getElementById("panel")
+.classList.remove("active");
 
-    photoInput.onchange=()=>{
+};
 
-      const file =
-      photoInput.files[0];
+document.getElementById("submitBtn").onclick=async()=>{
 
-      if(!file) return;
+const desc =
+document.getElementById("desc")
+.value
+.trim();
 
-      const reader =
-      new FileReader();
+if(!pendingLocation) return;
 
-      reader.onload=e=>{
+if(!desc){
 
-        photoBase64 =
-        e.target.result;
+showToast("Please describe the issue.");
 
-        previewImg.src =
-        photoBase64;
+return;
 
-        photoPreview.style.display =
-        "block";
+}
 
-      };
+try{
 
-      reader.readAsDataURL(file);
+await addDoc(reportsRef,{
 
-    };
+type:selectedType,
 
-    document.querySelectorAll(".type-btn")
-    .forEach(btn=>{
+description:desc,
 
-      btn.onclick=()=>{
+lat:pendingLocation.lat,
 
-        document.querySelectorAll(".type-btn")
-        .forEach(b=>b.classList.remove("selected"));
+lng:pendingLocation.lng,
 
-        btn.classList.add("selected");
+photoUrl:photoBase64 || null,
 
-        selectedType =
-        btn.dataset.type;
+timestamp:new Date().toISOString(),
 
-      };
+status:"reported",
 
-    });
+support:0,
 
-    map.on("click",e=>{
+notFixed:0,
 
-      pendingLocation =
-      e.latlng;
+fixedVotes:0
 
-      document.getElementById("desc")
-      .value = "";
+});
 
-      document.getElementById("panel")
-      .classList.add("active");
+document.getElementById("panel")
+.classList.remove("active");
 
-    });
+showToast("✅ Report submitted!");
 
-    document.getElementById("cancelBtn")
-    .onclick=()=>{
+}
 
-      document.getElementById("panel")
-      .classList.remove("active");
+catch(err){
 
-    };
+console.error(err);
 
-    document.getElementById("submitBtn")
-    .onclick=async()=>{
+showToast("❌ Error submitting report");
 
-      const desc =
-      document.getElementById("desc")
-      .value
-      .trim();
+}
 
-      if(!pendingLocation){
-        return;
-      }
+};
 
-      if(!desc){
+/* ── TOAST ── */
 
-        showToast(
-          "Please describe the issue."
-        );
+function showToast(msg){
 
-        return;
+const toast =
+document.getElementById("toast");
 
-      }
+toast.textContent = msg;
 
-      try{
+toast.classList.add("show");
 
-        await addDoc(reportsRef,{
+setTimeout(()=>{
 
-          type:selectedType,
+toast.classList.remove("show");
 
-          description:desc,
+},3000);
 
-          lat:pendingLocation.lat,
+}
 
-          lng:pendingLocation.lng,
-
-          photoUrl:photoBase64 || null,
-
-          timestamp:new Date().toISOString(),
-
-          createdAt:Date.now(),
-
-          status:"reported",
-
-          reactions:{
-
-            support:0,
-
-            notFixed:0,
-
-            fixed:0
-
-          }
-
-        });
-
-        document.getElementById("panel")
-        .classList.remove("active");
-
-        showToast(
-          "✅ Report submitted!"
-        );
-
-      }
-
-      catch(err){
-
-        console.error(err);
-
-        showToast(
-          "❌ Error submitting report"
-        );
-
-      }
-
-    };
-
-    /* ─────────────────────────────
-       Toast
-    ───────────────────────────── */
-
-    function showToast(msg){
-
-      const toast =
-      document.getElementById("toast");
-
-      toast.textContent = msg;
-
-      toast.classList.add("show");
-
-      setTimeout(()=>{
-
-        toast.classList.remove("show");
-
-      },3000);
-
-    }
-
-  </script>
+</script>
 
 </body>
 </html>
