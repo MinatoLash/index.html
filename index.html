@@ -1,451 +1,1296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CityWatch</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <meta charset="UTF-8"/>
 
-<style>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
-body{margin:0;font-family:sans-serif;overflow:hidden;}
-#map{width:100vw;height:100vh;}
+  <title>CityWatch</title>
 
-/* ───────── BUTTONS ───────── */
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
 
-.locate-btn{
-  position:fixed;
-  top:18px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#007bff;
-  color:white;
-  border:none;
-  padding:14px 22px;
-  border-radius:999px;
-  font-weight:700;
-  z-index:1000;
-}
+  <style>
 
-.menu-btn{
-  position:fixed;
-  top:18px;
-  left:18px;
-  width:52px;
-  height:52px;
-  border:none;
-  border-radius:12px;
-  background:white;
-  font-size:26px;
-  z-index:1001;
-}
+    *{
+      box-sizing:border-box;
+    }
 
-/* ───────── MENU ───────── */
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      overflow:hidden;
+      background:#f5f5f5;
+    }
 
-.menu{
-  position:fixed;
-  top:0;
-  left:-300px;
-  width:280px;
-  height:100%;
-  background:white;
-  z-index:2000;
-  padding:20px;
-  transition:0.3s;
-  overflow:auto;
-}
+    #map{
+      width:100vw;
+      height:100vh;
+    }
 
-.menu.open{left:0;}
+    /* ─────────────────────────────
+       Locate Button
+    ───────────────────────────── */
 
-.menu-item{
-  padding:14px;
-  font-weight:600;
-  cursor:pointer;
-}
+    .locate-btn{
 
-.menu-item:hover{background:#f5f5f5;}
+      position:fixed;
 
-.submenu{display:none;padding-left:12px;}
+      top:15px;
+      left:50%;
 
-hr{border:0;border-top:1px solid #eee;}
+      transform:translateX(-50%);
 
-/* ───────── PANEL ───────── */
+      z-index:1000;
 
-.issue-panel{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:white;
-  padding:16px;
-  transform:translateY(100%);
-  transition:0.3s;
-  border-radius:20px 20px 0 0;
-  z-index:1000;
-}
+      border:none;
+      border-radius:999px;
 
-.issue-panel.active{transform:translateY(0);}
+      background:#007bff;
+      color:white;
 
-.type-btn{
-  padding:10px;
-  margin:4px;
-  border:1px solid #ddd;
-  border-radius:10px;
-  cursor:pointer;
-}
+      padding:10px 18px;
 
-.type-btn.selected{background:#e8f0fe;}
+      font-size:14px;
+      font-weight:600;
 
-/* ───────── PIN ───────── */
+      cursor:pointer;
 
-.pin{
-  width:52px;
-  height:52px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:50%;
-  border:3px solid white;
-  font-size:26px;
-  box-shadow:0 2px 10px rgba(0,0,0,0.3);
-  position:relative;
-}
+      box-shadow:0 2px 10px rgba(0,0,0,0.25);
 
-.pin-label{
-  position:absolute;
-  bottom:-14px;
-  font-size:10px;
-  background:white;
-  padding:2px 6px;
-  border-radius:6px;
-  font-weight:700;
-}
+    }
 
-/* ───────── POPUP BUTTONS ───────── */
+    /* ─────────────────────────────
+       Menu Button
+    ───────────────────────────── */
 
-.delete-btn{
-  margin-top:8px;
-  background:#ff3b30;
-  color:white;
-  border:none;
-  padding:6px 10px;
-  border-radius:8px;
-  cursor:pointer;
-}
+    .menu-btn{
 
-.react-btn{
-  margin:4px 4px 0 0;
-  padding:6px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
+      position:fixed;
 
-/* ───────── TOAST ───────── */
+      top:15px;
+      left:15px;
 
-.toast{
-  position:fixed;
-  bottom:100px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#111;
-  color:white;
-  padding:10px 16px;
-  border-radius:999px;
-  opacity:0;
-  transition:0.3s;
-}
+      z-index:1001;
 
-.toast.show{opacity:1;}
+      width:44px;
+      height:44px;
 
-</style>
+      border:none;
+      border-radius:10px;
+
+      background:white;
+
+      font-size:22px;
+
+      cursor:pointer;
+
+      box-shadow:0 2px 10px rgba(0,0,0,0.15);
+
+    }
+
+    /* ─────────────────────────────
+       Menu
+    ───────────────────────────── */
+
+    .menu{
+
+      position:fixed;
+
+      top:0;
+      left:-260px;
+
+      width:250px;
+      height:100%;
+
+      background:white;
+
+      z-index:1002;
+
+      padding:28px 20px;
+
+      transition:0.3s ease;
+
+      box-shadow:2px 0 16px rgba(0,0,0,0.18);
+
+    }
+
+    .menu.open{
+      left:0;
+    }
+
+    .menu h3{
+      margin:0;
+      color:#007bff;
+      font-size:22px;
+    }
+
+    .menu p{
+      margin-top:4px;
+      color:#888;
+      font-size:13px;
+    }
+
+    .menu hr{
+      border:none;
+      border-top:1px solid #eee;
+      margin:18px 0;
+    }
+
+    .menu-item{
+
+      display:flex;
+      align-items:center;
+
+      padding:12px 8px;
+
+      border-radius:10px;
+
+      cursor:pointer;
+
+      transition:0.2s;
+
+    }
+
+    .menu-item:hover{
+      background:#f5f5f5;
+    }
+
+    .coming{
+
+      margin-left:auto;
+
+      font-size:11px;
+
+      color:#aaa;
+
+    }
+
+    .menu-overlay{
+
+      position:fixed;
+
+      inset:0;
+
+      z-index:1001;
+
+      display:none;
+
+    }
+
+    .menu-overlay.show{
+      display:block;
+    }
+
+    /* ─────────────────────────────
+       Issue Panel
+    ───────────────────────────── */
+
+    .issue-panel{
+
+      position:fixed;
+
+      left:0;
+      right:0;
+      bottom:0;
+
+      background:white;
+
+      z-index:1000;
+
+      padding:20px 16px 34px;
+
+      border-radius:20px 20px 0 0;
+
+      transform:translateY(100%);
+
+      transition:0.35s cubic-bezier(0.32,0.72,0,1);
+
+      box-shadow:0 -6px 30px rgba(0,0,0,0.15);
+
+    }
+
+    .issue-panel.active{
+      transform:translateY(0);
+    }
+
+    .panel-handle{
+
+      width:40px;
+      height:4px;
+
+      margin:0 auto 14px;
+
+      background:#ddd;
+
+      border-radius:2px;
+
+    }
+
+    .issue-panel h3{
+      margin:0 0 14px;
+    }
+
+    /* ─────────────────────────────
+       Type Grid
+    ───────────────────────────── */
+
+    .type-grid{
+
+      display:grid;
+
+      grid-template-columns:repeat(5,1fr);
+
+      gap:8px;
+
+      margin-bottom:14px;
+
+    }
+
+    .type-btn{
+
+      border:2px solid #e0e0e0;
+
+      background:white;
+
+      border-radius:12px;
+
+      padding:10px 4px;
+
+      font-size:11px;
+
+      cursor:pointer;
+
+      transition:0.2s;
+
+    }
+
+    .type-btn.selected{
+
+      border-color:#007bff;
+
+      background:#e8f0fe;
+
+      color:#007bff;
+
+      font-weight:600;
+
+    }
+
+    /* ─────────────────────────────
+       Textarea
+    ───────────────────────────── */
+
+    textarea{
+
+      width:100%;
+
+      border:2px solid #e0e0e0;
+
+      border-radius:10px;
+
+      padding:12px;
+
+      font-size:14px;
+
+      resize:none;
+
+      outline:none;
+
+      margin-bottom:12px;
+
+    }
+
+    textarea:focus{
+      border-color:#007bff;
+    }
+
+    /* ─────────────────────────────
+       Photo Upload
+    ───────────────────────────── */
+
+    .photo-label{
+
+      display:flex;
+
+      align-items:center;
+      justify-content:center;
+
+      border:2px dashed #ccc;
+
+      border-radius:10px;
+
+      padding:12px;
+
+      margin-bottom:12px;
+
+      cursor:pointer;
+
+      font-size:14px;
+      font-weight:600;
+
+      color:#666;
+
+      transition:0.2s;
+
+    }
+
+    .photo-label:hover{
+
+      border-color:#007bff;
+
+      color:#007bff;
+
+    }
+
+    #photoPreview img{
+
+      width:100%;
+
+      max-height:180px;
+
+      object-fit:cover;
+
+      border-radius:10px;
+
+      margin-bottom:12px;
+
+    }
+
+    /* ─────────────────────────────
+       Buttons
+    ───────────────────────────── */
+
+    .panel-actions{
+
+      display:flex;
+
+      gap:8px;
+
+    }
+
+    .panel-actions button{
+
+      flex:1;
+
+      padding:13px;
+
+      border:none;
+
+      border-radius:10px;
+
+      font-size:14px;
+      font-weight:600;
+
+      cursor:pointer;
+
+    }
+
+    #submitBtn{
+
+      background:#007bff;
+
+      color:white;
+
+    }
+
+    #cancelBtn{
+
+      background:#f0f0f0;
+
+      color:#555;
+
+    }
+
+    /* ─────────────────────────────
+       Toast
+    ───────────────────────────── */
+
+    .toast{
+
+      position:fixed;
+
+      bottom:90px;
+      left:50%;
+
+      transform:translateX(-50%);
+
+      background:#111;
+      color:white;
+
+      padding:10px 20px;
+
+      border-radius:999px;
+
+      font-size:13px;
+      font-weight:600;
+
+      opacity:0;
+
+      transition:0.3s;
+
+      z-index:3000;
+
+    }
+
+    .toast.show{
+      opacity:1;
+    }
+
+    /* ─────────────────────────────
+       Popup Buttons
+    ───────────────────────────── */
+
+    .popup-btn{
+
+      width:100%;
+
+      margin-top:8px;
+
+      border:none;
+
+      border-radius:8px;
+
+      padding:10px;
+
+      cursor:pointer;
+
+      font-size:13px;
+
+      font-weight:600;
+
+    }
+
+    .support-btn{
+      background:#dbeafe;
+    }
+
+    .notfixed-btn{
+      background:#fef3c7;
+    }
+
+    .fixed-btn{
+      background:#dcfce7;
+    }
+
+  </style>
+
 </head>
 
 <body>
 
-<div id="map"></div>
+  <div id="map"></div>
+
+  <div class="toast" id="toast"></div>
+
+  <button
+    class="locate-btn"
+    id="locateBtn"
+  >
+    📍 Find My Location
+  </button>
+
+  <button
+    class="menu-btn"
+    id="menuBtn"
+  >
+    ☰
+  </button>
+
+  <div
+    class="menu-overlay"
+    id="menuOverlay"
+  ></div>
+
+  <!-- ─────────────────────────────
+       Side Menu
+  ───────────────────────────── -->
+
+  <div class="menu" id="menu">
+
+    <h3>🗺️ CityWatch</h3>
+
+    <p>Community Issue Map</p>
+
+    <hr>
+
+    <div class="menu-item">
+      📍 Report an Issue
+    </div>
+
+    <div class="menu-item">
+      📊 Stats
+      <span class="coming">coming soon</span>
+    </div>
+
+    <div class="menu-item">
+      🎛️ Filters
+      <span class="coming">coming soon</span>
+    </div>
+
+    <hr>
+
+    <div style="font-size:12px;color:#aaa;">
+      More features coming soon...
+    </div>
+
+  </div>
 
-<button class="locate-btn" id="locateBtn">📍 Locate</button>
-<button class="menu-btn" id="menuBtn">☰</button>
+  <!-- ─────────────────────────────
+       Issue Panel
+  ───────────────────────────── -->
 
-<div class="toast" id="toast"></div>
+  <div class="issue-panel" id="panel">
 
-<!-- ───────── MENU ───────── -->
+    <div class="panel-handle"></div>
 
-<div class="menu" id="menu">
+    <h3>📌 Report an Issue</h3>
 
-<h3>🗺️ CityWatch</h3>
-<hr>
+    <div class="type-grid">
 
-<div class="menu-item">🏠 Home</div>
-<div class="menu-item">📌 Report Issue</div>
-<div class="menu-item">🗺️ Map</div>
-<div class="menu-item">📍 My Reports</div>
-<div class="menu-item">💬 Community Feedback</div>
+      <button
+        class="type-btn"
+        data-type="Pothole"
+      >
+        🕳️<br>Pothole
+      </button>
 
-<hr>
+      <button
+        class="type-btn"
+        data-type="Trash"
+      >
+        🗑️<br>Trash
+      </button>
 
-<div class="menu-item" onclick="toggleCompanies()">
-🏢 Companies ▾
-</div>
+      <button
+        class="type-btn"
+        data-type="Leak"
+      >
+        💧<br>Leak
+      </button>
 
-<div class="submenu" id="companies">
+      <button
+        class="type-btn"
+        data-type="Light"
+      >
+        💡<br>Light
+      </button>
 
-<div class="menu-item" onclick="openCompany('municipality')">🏛️ Municipality</div>
-<div class="menu-item" onclick="openCompany('sanral')">🛣️ SANRAL</div>
-<div class="menu-item" onclick="openCompany('ngo')">🤝 NGO</div>
-<div class="menu-item" onclick="openCompany('foundation')">🌱 Foundation</div>
+      <button
+        class="type-btn"
+        data-type="Other"
+      >
+        ⚠️<br>Other
+      </button>
 
-</div>
+    </div>
 
-<hr>
+    <textarea
+      id="desc"
+      rows="3"
+      placeholder="Describe the issue..."
+    ></textarea>
 
-<div class="menu-item">⚙️ Settings</div>
+    <label
+      class="photo-label"
+      for="photoInput"
+    >
+      📷 Take / Upload Photo
+    </label>
 
-</div>
+    <input
+      type="file"
+      id="photoInput"
+      accept="image/*"
+      capture="environment"
+      hidden
+    >
 
-<!-- ───────── PANEL ───────── -->
+    <div
+      id="photoPreview"
+      style="display:none;"
+    >
+      <img id="previewImg">
+    </div>
 
-<div class="issue-panel" id="panel">
+    <div class="panel-actions">
 
-<h3>Report Issue</h3>
+      <button id="cancelBtn">
+        Cancel
+      </button>
 
-<div>
-<button class="type-btn" data-type="Pothole">🕳️</button>
-<button class="type-btn" data-type="Trash">🗑️</button>
-<button class="type-btn" data-type="Leak">💧</button>
-<button class="type-btn" data-type="Light">💡</button>
-<button class="type-btn" data-type="Other">⚠️</button>
-</div>
+      <button id="submitBtn">
+        Submit Report
+      </button>
 
-<textarea id="desc" placeholder="Describe issue"></textarea>
+    </div>
 
-<button id="submitBtn">Submit</button>
+  </div>
 
-</div>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script type="module">
 
-<script type="module">
+    import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 
-import {
-initializeApp
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import {
 
-import {
-getFirestore,
-collection,
-addDoc,
-onSnapshot,
-deleteDoc,
-doc,
-getDoc,
-updateDoc
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+      getFirestore,
 
-/* ───────── FIREBASE ───────── */
+      collection,
 
-const app = initializeApp({
-apiKey:"YOUR_KEY",
-authDomain:"YOUR_DOMAIN",
-projectId:"YOUR_ID"
-});
+      addDoc,
 
-const db = getFirestore(app);
-const ref = collection(db,"reports");
+      onSnapshot,
 
-/* ───────── MAP ───────── */
+      updateDoc,
 
-const map = L.map("map").setView([-26.2,28.0],13);
+      doc,
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
-.addTo(map);
+      getDoc
 
-/* ───────── USER ───────── */
+    }
 
-let userId = localStorage.getItem("cw");
-if(!userId){
-userId = crypto.randomUUID();
-localStorage.setItem("cw",userId);
-}
-
-/* ───────── MENU ───────── */
-
-window.toggleCompanies = () => {
-const el = document.getElementById("companies");
-el.style.display = el.style.display==="block"?"none":"block";
-};
-
-/* ───────── COMPANIES ───────── */
-
-const companies = {
-
-municipality:{
-name:"Municipality",
-issues:["Potholes","Water","Sewage","Streetlights"]
-},
-
-sanral:{
-name:"SANRAL",
-issues:["Highways","Road Damage","Signs"]
-},
-
-ngo:{
-name:"NGO",
-issues:["Safety","Cleanup","Community Help"]
-},
-
-foundation:{
-name:"Foundation",
-issues:["School Repair","Community Projects"]
-}
+    from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-};
-
-window.openCompany = (key) => {
-const c = companies[key];
-alert(c.name + "\n\nIssues:\n" + c.issues.join(", "));
-};
-
-/* ───────── PIN STYLE ───────── */
-
-function color(status){
-if(status==="fixed")return"#22c55e";
-if(status==="progress")return"#facc15";
-return"#ef4444";
-}
-
-function pin(icon,status){
-return L.divIcon({
-html:`
-<div class="pin" style="background:${color(status)}">
-${icon}
-<div class="pin-label">${status}</div>
-</div>
-`,
-iconSize:[52,52],
-iconAnchor:[26,26]
-});
-}
-
-/* ───────── DATA ───────── */
-
-const icons={
-Pothole:"🕳️",
-Trash:"🗑️",
-Leak:"💧",
-Light:"💡",
-Other:"⚠️"
-};
-
-let markers={};
-
-/* ───────── REALTIME ───────── */
-
-onSnapshot(ref,snap=>{
-snap.docChanges().forEach(c=>{
-const id=c.doc.id;
-const r=c.doc.data();
-
-if(c.type==="added"){
-
-let popup=`
-<b>${r.type}</b><br>
-${r.description}<br>
-Status: ${r.status}
-<hr>
-
-<button class="react-btn" onclick="react('${id}','support')">👍</button>
-<button class="react-btn" onclick="react('${id}','notFixed')">⚠️</button>
-<button class="react-btn" onclick="react('${id}','fixed')">✅</button>
-`;
-
-if(r.ownerId===userId){
-popup+=`<br><button class="delete-btn" onclick="del('${id}')">Delete</button>`;
-}
-
-markers[id]=L.marker([r.lat,r.lng],{
-icon:pin(icons[r.type],r.status)
-}).addTo(map).bindPopup(popup);
-
-}
-
-if(c.type==="removed"){
-map.removeLayer(markers[id]);
-}
-
-});
-});
-
-/* ───────── DELETE ───────── */
-
-window.del=async(id)=>{
-await deleteDoc(doc(db,"reports",id));
-toast("Deleted");
-};
-
-/* ───────── REACT ───────── */
-
-window.react=async(id,type)=>{
-const d=doc(db,"reports",id);
-const s=await getDoc(d);
-const data=s.data();
-
-data.reactions[type]=(data.reactions?.[type]||0)+1;
-
-await updateDoc(d,{reactions:data.reactions});
-toast("Reacted");
-};
-
-/* ───────── SUBMIT ───────── */
-
-let type="Other";
-let pos=null;
-
-document.querySelectorAll(".type-btn").forEach(b=>{
-b.onclick=()=>{
-document.querySelectorAll(".type-btn")
-.forEach(x=>x.classList.remove("selected"));
-b.classList.add("selected");
-type=b.dataset.type;
-};
-});
-
-map.on("click",e=>{
-pos=e.latlng;
-panel.classList.add("active");
-});
-
-submitBtn.onclick=async()=>{
-const desc=document.getElementById("desc").value;
-if(!pos||!desc)return;
-
-await addDoc(ref,{
-type,
-description:desc,
-lat:pos.lat,
-lng:pos.lng,
-status:"reported",
-ownerId:userId,
-createdAt:Date.now(),
-reactions:{support:0,notFixed:0,fixed:0}
-});
-
-panel.classList.remove("active");
-toast("Sent");
-};
-
-/* ───────── TOAST ───────── */
-
-function toast(t){
-const el=document.getElementById("toast");
-el.textContent=t;
-el.classList.add("show");
-setTimeout(()=>el.classList.remove("show"),2000);
-}
-
-</script>
+    /* ─────────────────────────────
+       Firebase
+    ───────────────────────────── */
+
+    const firebaseConfig = {
+
+      apiKey:"AIzaSyBT8j239aELPwxD0iQcQj6fdnhQVHNuMLU",
+
+      authDomain:"community-map-125ba.firebaseapp.com",
+
+      projectId:"community-map-125ba",
+
+      storageBucket:"community-map-125ba.firebasestorage.app",
+
+      messagingSenderId:"1016337399487",
+
+      appId:"1:1016337399487:web:77ba8a7b8c89fd850fd00a",
+
+      measurementId:"G-7NYRJ3B89Q"
+
+    };
+
+    const app = initializeApp(firebaseConfig);
+
+    const db = getFirestore(app);
+
+    const reportsRef = collection(db,"reports");
+
+    /* ─────────────────────────────
+       Map
+    ───────────────────────────── */
+
+    const map = L.map("map")
+    .setView([-26.2041,28.0473],13);
+
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        attribution:"© OpenStreetMap contributors"
+      }
+    ).addTo(map);
+
+    /* ─────────────────────────────
+       Status Color
+    ───────────────────────────── */
+
+    function statusColor(status){
+
+      if(status === "fixed"){
+        return "#22c55e";
+      }
+
+      if(status === "progress"){
+        return "#facc15";
+      }
+
+      return "#ef4444";
+
+    }
+
+    /* ─────────────────────────────
+       Urgency System
+    ───────────────────────────── */
+
+    function urgencyLevel(report){
+
+      let score = 0;
+
+      const ageHours =
+      (Date.now() - report.createdAt) / 3600000;
+
+      if(ageHours > 72){
+        score += 3;
+      }
+
+      else if(ageHours > 24){
+        score += 2;
+      }
+
+      else{
+        score += 1;
+      }
+
+      const support =
+      report.reactions?.support || 0;
+
+      const notFixed =
+      report.reactions?.notFixed || 0;
+
+      score += Math.floor(
+        (support + notFixed) / 3
+      );
+
+      if(report.type === "Leak"){
+        score += 2;
+      }
+
+      if(report.type === "Pothole"){
+        score += 1;
+      }
+
+      if(score >= 6){
+        return "HIGH";
+      }
+
+      if(score >= 3){
+        return "MEDIUM";
+      }
+
+      return "LOW";
+
+    }
+
+    /* ─────────────────────────────
+       Marker Builder
+    ───────────────────────────── */
+
+    function createMarker(type,status,urgency){
+
+      const emojiMap = {
+
+        Pothole:"🕳️",
+
+        Trash:"🗑️",
+
+        Leak:"💧",
+
+        Light:"💡",
+
+        Other:"⚠️"
+
+      };
+
+      return L.divIcon({
+
+        className:"",
+
+        html:`
+
+          <div style="
+            width:56px;
+            height:56px;
+            border-radius:50%;
+            background:${statusColor(status)};
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:28px;
+            border:3px solid white;
+            position:relative;
+            box-shadow:0 3px 12px rgba(0,0,0,0.25);
+          ">
+
+            ${emojiMap[type]}
+
+            <div style="
+              position:absolute;
+              bottom:-18px;
+              background:white;
+              padding:2px 6px;
+              border-radius:8px;
+              font-size:10px;
+              font-weight:700;
+              white-space:nowrap;
+            ">
+
+              ${status.toUpperCase()}
+
+            </div>
+
+            <div style="
+              position:absolute;
+              top:-10px;
+              right:-10px;
+              background:black;
+              color:white;
+              width:22px;
+              height:22px;
+              border-radius:50%;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-size:10px;
+              font-weight:700;
+            ">
+
+              ${
+                urgency === "HIGH"
+                ? "!!!"
+                : urgency === "MEDIUM"
+                ? "!!"
+                : "!"
+              }
+
+            </div>
+
+          </div>
+
+        `,
+
+        iconSize:[56,56],
+
+        iconAnchor:[28,28]
+
+      });
+
+    }
+
+    /* ─────────────────────────────
+       Realtime Reports
+    ───────────────────────────── */
+
+    const markers = {};
+
+    onSnapshot(reportsRef,snapshot=>{
+
+      snapshot.docChanges().forEach(change=>{
+
+        const id = change.doc.id;
+
+        const r = change.doc.data();
+
+        const urgency =
+        urgencyLevel(r);
+
+        const popup = `
+
+          <div style="min-width:220px;">
+
+            <b style="font-size:16px;">
+              ${r.type}
+            </b>
+
+            <br><br>
+
+            ${r.description}
+
+            <br><br>
+
+            <b>Status:</b>
+            ${r.status}
+
+            <br>
+
+            <b>Urgency:</b>
+            ${urgency}
+
+            <br><br>
+
+            👍 Support:
+            ${r.reactions?.support || 0}
+
+            <br>
+
+            ⚠️ Not Fixed:
+            ${r.reactions?.notFixed || 0}
+
+            <br>
+
+            ✅ Fixed:
+            ${r.reactions?.fixed || 0}
+
+            <br><br>
+
+            <button
+              class="popup-btn support-btn"
+              onclick="reactToReport('${id}','support')"
+            >
+              👍 I support this report
+            </button>
+
+            <button
+              class="popup-btn notfixed-btn"
+              onclick="reactToReport('${id}','notFixed')"
+            >
+              ⚠️ This report has NOT been fixed
+            </button>
+
+            <button
+              class="popup-btn fixed-btn"
+              onclick="reactToReport('${id}','fixed')"
+            >
+              ✅ This report HAS been fixed
+            </button>
+
+            ${
+              r.photoUrl
+              ? `
+                <br>
+
+                <img
+                  src="${r.photoUrl}"
+                  style="
+                    width:100%;
+                    margin-top:10px;
+                    border-radius:10px;
+                  "
+                >
+              `
+              : ""
+            }
+
+          </div>
+
+        `;
+
+        if(markers[id]){
+
+          map.removeLayer(markers[id]);
+
+        }
+
+        markers[id] = L.marker(
+
+          [r.lat,r.lng],
+
+          {
+
+            icon:createMarker(
+
+              r.type,
+
+              r.status,
+
+              urgency
+
+            )
+
+          }
+
+        )
+        .addTo(map)
+        .bindPopup(popup);
+
+      });
+
+    });
+
+    /* ─────────────────────────────
+       Reactions
+    ───────────────────────────── */
+
+    window.reactToReport = async(id,type)=>{
+
+      const reportDoc =
+      doc(db,"reports",id);
+
+      const snap =
+      await getDoc(reportDoc);
+
+      const data =
+      snap.data();
+
+      const reactions =
+      data.reactions || {
+
+        support:0,
+
+        notFixed:0,
+
+        fixed:0
+
+      };
+
+      reactions[type]++;
+
+      let newStatus =
+      data.status || "reported";
+
+      if(type === "fixed"){
+
+        newStatus = "fixed";
+
+      }
+
+      else if(type === "notFixed"){
+
+        newStatus = "progress";
+
+      }
+
+      await updateDoc(reportDoc,{
+
+        reactions,
+
+        status:newStatus
+
+      });
+
+      showToast("Reaction added");
+
+    };
+
+    /* ─────────────────────────────
+       Menu
+    ───────────────────────────── */
+
+    const menu =
+    document.getElementById("menu");
+
+    const overlay =
+    document.getElementById("menuOverlay");
+
+    document.getElementById("menuBtn").onclick=()=>{
+
+      menu.classList.toggle("open");
+
+      overlay.classList.toggle("show");
+
+    };
+
+    overlay.onclick=()=>{
+
+      menu.classList.remove("open");
+
+      overlay.classList.remove("show");
+
+    };
+
+    /* ─────────────────────────────
+       User Location
+    ───────────────────────────── */
+
+    document.getElementById("locateBtn").onclick=()=>{
+
+      navigator.geolocation.getCurrentPosition(pos=>{
+
+        const lat = pos.coords.latitude;
+
+        const lng = pos.coords.longitude;
+
+        map.setView([lat,lng],17);
+
+        L.circleMarker(
+          [lat,lng],
+          {
+            radius:10,
+            color:"#007bff",
+            fillColor:"#007bff",
+            fillOpacity:1
+          }
+        )
+        .addTo(map)
+        .bindPopup("📍 You are here")
+        .openPopup();
+
+      });
+
+    };
+
+    /* ─────────────────────────────
+       Report System
+    ───────────────────────────── */
+
+    let pendingLocation = null;
+
+    let selectedType = "Other";
+
+    let photoBase64 = null;
+
+    const photoInput =
+    document.getElementById("photoInput");
+
+    const previewImg =
+    document.getElementById("previewImg");
+
+    const photoPreview =
+    document.getElementById("photoPreview");
+
+    photoInput.onchange=()=>{
+
+      const file =
+      photoInput.files[0];
+
+      if(!file) return;
+
+      const reader =
+      new FileReader();
+
+      reader.onload=e=>{
+
+        photoBase64 =
+        e.target.result;
+
+        previewImg.src =
+        photoBase64;
+
+        photoPreview.style.display =
+        "block";
+
+      };
+
+      reader.readAsDataURL(file);
+
+    };
+
+    document.querySelectorAll(".type-btn")
+    .forEach(btn=>{
+
+      btn.onclick=()=>{
+
+        document.querySelectorAll(".type-btn")
+        .forEach(b=>b.classList.remove("selected"));
+
+        btn.classList.add("selected");
+
+        selectedType =
+        btn.dataset.type;
+
+      };
+
+    });
+
+    map.on("click",e=>{
+
+      pendingLocation =
+      e.latlng;
+
+      document.getElementById("desc")
+      .value = "";
+
+      document.getElementById("panel")
+      .classList.add("active");
+
+    });
+
+    document.getElementById("cancelBtn")
+    .onclick=()=>{
+
+      document.getElementById("panel")
+      .classList.remove("active");
+
+    };
+
+    document.getElementById("submitBtn")
+    .onclick=async()=>{
+
+      const desc =
+      document.getElementById("desc")
+      .value
+      .trim();
+
+      if(!pendingLocation){
+        return;
+      }
+
+      if(!desc){
+
+        showToast(
+          "Please describe the issue."
+        );
+
+        return;
+
+      }
+
+      try{
+
+        await addDoc(reportsRef,{
+
+          type:selectedType,
+
+          description:desc,
+
+          lat:pendingLocation.lat,
+
+          lng:pendingLocation.lng,
+
+          photoUrl:photoBase64 || null,
+
+          timestamp:new Date().toISOString(),
+
+          createdAt:Date.now(),
+
+          status:"reported",
+
+          reactions:{
+
+            support:0,
+
+            notFixed:0,
+
+            fixed:0
+
+          }
+
+        });
+
+        document.getElementById("panel")
+        .classList.remove("active");
+
+        showToast(
+          "✅ Report submitted!"
+        );
+
+      }
+
+      catch(err){
+
+        console.error(err);
+
+        showToast(
+          "❌ Error submitting report"
+        );
+
+      }
+
+    };
+
+    /* ─────────────────────────────
+       Toast
+    ───────────────────────────── */
+
+    function showToast(msg){
+
+      const toast =
+      document.getElementById("toast");
+
+      toast.textContent = msg;
+
+      toast.classList.add("show");
+
+      setTimeout(()=>{
+
+        toast.classList.remove("show");
+
+      },3000);
+
+    }
+
+  </script>
 
 </body>
 </html>
