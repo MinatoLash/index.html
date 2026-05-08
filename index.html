@@ -215,7 +215,7 @@ onSnapshot(reportsRef, snapshot=>{
       : "";
 
     const deleteButton = r.ownerId===userId
-      ? `<button class="popup-btn delete-btn" onclick="deleteReport('${id}')">🗑️ Delete My Report</button>`
+      ? `<button class="popup-btn delete-btn" onclick="deleteReport('${id}')">&#128465; Delete My Report</button>`
       : "";
 
     const urgencyColor = urgency==="HIGH"?"#ef4444":urgency==="MEDIUM"?"#f59e0b":"#22c55e";
@@ -232,11 +232,12 @@ onSnapshot(reportsRef, snapshot=>{
         👍 Support: ${r.support||0}<br>
         ⚠️ Not Fixed: ${r.notFixed||0}<br>
         ✅ Fixed Votes: ${r.fixedVotes||0}<br><br>
-        <button class="popup-btn support-btn" onclick="reactToReport('${id}','support')">👍 I support this</button>
-        <button class="popup-btn warn-btn"    onclick="reactToReport('${id}','notFixed')">⚠️ Still not fixed</button>
-        <button class="popup-btn fixed-btn"   onclick="reactToReport('${id}','fixedVotes')">✅ This has been fixed</button>
+        <button class="popup-btn support-btn" onclick="reactToReport('${id}','support')">&#128077; I support this</button>
+        <button class="popup-btn warn-btn"    onclick="reactToReport('${id}','notFixed')">&#9888; Still not fixed</button>
+        <button class="popup-btn fixed-btn"   onclick="reactToReport('${id}','fixedVotes')">&#10003; This has been fixed</button>
         ${deleteButton}
         ${photoHtml}
+        ${!photoSrc ? `<div style="margin-top:10px;padding:10px;background:#f9f9f9;border-radius:8px;text-align:center;font-size:12px;color:#aaa;">No photo attached</div>` : ""}
       </div>
     `);
 
